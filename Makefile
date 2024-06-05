@@ -18,21 +18,14 @@ SOURCES = $(wildcard $(SRCDIR)/*.cpp)
 OBJECTS = $(patsubst $(SRCDIR)/%.cpp, $(OBJDIR)/%.o, $(SOURCES))
 
 # Règle par défaut
-all: build
+all: build run clean
 
 # Cible pour construire seulement
-build: $(TARGET)
-
-# Cible pour construire et exécuter
-buildAndRun: build
-	@$(TARGET)
+build: create_dirs $(TARGET)
 
 # Cible pour exécuter
 run:
 	@$(TARGET)
-
-# Cible pour nttoyer, construire et exécuter
-cleanBuildAndRun: clean buildAndRun
 
 # Règle pour créer l'exécutable
 $(TARGET): $(OBJECTS)
@@ -42,12 +35,23 @@ $(TARGET): $(OBJECTS)
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
+# Crée les dossiers bin et obj s'ils n'existent pas
+create_dirs:
+ifeq ($(OS),Windows_NT)
+	@if not exist $(BINDIR) mkdir $(BINDIR)
+	@if not exist $(OBJDIR) mkdir $(OBJDIR)
+else
+	@mkdir -p $(BINDIR)
+	@mkdir -p $(OBJDIR)
+endif
+	
+
 # Règle de nettoyage
 clean:
 ifeq ($(OS),Windows_NT)
-	del /f $(OBJDIR)\*.o
+	@if exist $(OBJDIR) rmdir /s /q $(OBJDIR)
 else
-	rm -f $(OBJECTS)
+	@rm -rf $(OBJECTS)
 endif
 
-.PHONY: all build buildAndRun clean
+.PHONY: all build buildAndRun clean cleanBuildAndRun run
