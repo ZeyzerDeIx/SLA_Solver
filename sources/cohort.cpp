@@ -4,9 +4,11 @@ using namespace std;
 
 Cohort::Cohort(int id, int size): City(id), m_size(size) {}
 
-bool Cohort::isCohort() {return true;}
+int Cohort::getSize() {return m_size;}
 
 vector<Type>& Cohort::getTypes() {return m_types;}
+
+bool Cohort::isCohort() {return true;}
 
 ostream& operator<<(ostream& os, const Cohort& cohort)
 {

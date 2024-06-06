@@ -20,11 +20,13 @@ public:
 	Cohort(int id, int size);
 
 	/**
-	 * @brief Détermine si la ville est une cohorte.
+	 * @brief Récupérer la taille de la cohorte.
+	 * 
+	 * Cela correspond au nombre de patients.
 	 *
-	 * @return True, car nous sommes dans la classe fille, cohorte.
+	 * @return La taille.
 	 */
-	bool isCohort() override;
+	int getSize();
 
 	/**
 	 * @brief Récupérer la liste des types de la cohorte.
@@ -32,6 +34,13 @@ public:
 	 * @return Une référence au vecteur des types de la cohorte.
 	 */
 	std::vector<Type>& getTypes();
+
+	/**
+	 * @brief Détermine si la ville est une cohorte.
+	 *
+	 * @return True, car nous sommes dans la classe fille, cohorte.
+	 */
+	bool isCohort() override;
 
 	/**
 	 * @brief Permet d'afficher la cohorte sur un flux (cout, fichier en écriture, etc.)
