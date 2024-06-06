@@ -1,6 +1,13 @@
 #pragma once
 
 #include <iostream>
+#include "tree.h"
+#include "city.h"
+
+//Pour éviter une boucle d'inclusion, type.h et cohort.h sont inclus dans tube.cpp
+class Type;
+class Cohort;
+
 /**
  * @brief Cette classe modélise un tube.
  */
@@ -12,7 +19,14 @@ public:
 	 *
 	 * @param volume  Le volume contenu dans le tube.
 	 */
-	Tube(int volume);
+	Tube(Type& type, int volume);
+
+	/**
+	 * @brief Récupérer le type auquel est rattaché le tube.
+	 *
+	 * @return Une référence au type.
+	 */
+	Type& getType();
 
 	/**
 	 * @brief Getter pour le volume contenu dans le tube.
@@ -50,9 +64,30 @@ public:
 	 */
 	void consume(int volume);
 
+	/**
+	 * @brief Récupérer l'arbre de répartition du tube.
+	 *
+	 * @return     The tree.
+	 */
+	Tree<City*>& getTree();
+
+	/**
+	 * @brief Permet d'afficher le tube sur un flux (cout, fichier en écriture, etc.)
+	 *
+	 * @param os Le flux sur lequel écrire.
+	 * @param[in] tube Le tube.
+	 *
+	 * @return Une référence au flux utilisé.
+	 */
 	friend std::ostream& operator<<(std::ostream& os, const Tube& tube);
 
 private:
+
+	/**
+	 * @brief Type auquel est rattaché le tube.
+	 */
+	Type& m_type;
+
 	/**
 	 * @brief Le volume contenu dans le tube.
 	 */
@@ -62,4 +97,13 @@ private:
 	 * @brief Le volume utilisé du tube.
 	 */
 	int m_usedVolume;
+
+	/**
+	 * @brief Arbre de répartition du tube.
+	 * 
+	 * Il contient les villes utilisant le tube et la structure de la répartition, c'est-à-dire l'ordre dans lequel sont visités les villes.
+	 * 
+	 * De cet arbre peuvent être déduis les arcs à enregistrer dans la solution.
+	 */
+	Tree<City*> m_tree;
 };

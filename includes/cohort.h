@@ -1,12 +1,12 @@
 #pragma once
 
 #include "city.h"
-#include "tube.h"
-
-using Type = std::vector<Tube>;
+#include "type.h"
 
 /**
  * @brief Cette classe modélise une cohorte.
+ * 
+ * On appel cohorte une ville dont le CHU contient une cohorte de patient sur laquelle faire des prélèvements.
  */
 class Cohort: public City
 {
@@ -18,22 +18,29 @@ public:
 	 * @param[in] size La taille de la cohorte.
 	 */
 	Cohort(int id, int size);
-	/**
-	 * @brief Définit les tubes associés à chaque type dans la cohorte.
-	 *
-	 * @param tubes Les tubes de la cohortes par type.
-	 */
-	void setTubes(std::vector<std::vector<Tube>> tubes);
 
 	/**
-	 * @brief Dtermine si la ville est une cohorte.
+	 * @brief Détermine si la ville est une cohorte.
 	 *
 	 * @return True, car nous sommes dans la classe fille, cohorte.
 	 */
 	bool isCohort() override;
 
-	std::vector<std::vector<Tube>>& getTubes();
+	/**
+	 * @brief Récupérer la liste des types de la cohorte.
+	 *
+	 * @return Une référence au vecteur des types de la cohorte.
+	 */
+	std::vector<Type>& getTypes();
 
+	/**
+	 * @brief Permet d'afficher la cohorte sur un flux (cout, fichier en écriture, etc.)
+	 *
+	 * @param os Le flux sur lequel écrire.
+	 * @param[in] cohort La cohorte.
+	 *
+	 * @return Une référence au flux utilisé.
+	 */
 	friend std::ostream& operator<<(std::ostream& os, const Cohort& cohort);
 
 	/**
@@ -46,24 +53,17 @@ public:
 	bool operator==(const int& x);
 	
 private:
-
-	/**
-	 * @brief Affiche la cohorte.
-	 *
-	 * @param os Le flux de sortie.
-	 */
-	void print(std::ostream& os) const override;
 	/**
 	 * @brief Taille de la cohorte.
 	 * 
 	 * Cela correspond au nombre de patients et donc de tubes.
 	 */
 	int m_size;
+
 	/**
-	 * @brief Tubes de la cohorte par id de type.
+	 * @brief Types de la cohorte.
 	 * 
-	 * Il s'agit d'un vecteur de vecteurs, le contenant est le type.
-	 * Si l'on appel m_tubes[2][4] cela correspond au 5ème tube du 3ème type.
+	 * Ils contiennent les tubes.
 	 */
-	std::vector<Type> m_tubes;
+	std::vector<Type> m_types;
 };

@@ -46,7 +46,7 @@ public:
 	int getId();
 
 	/**
-	 * @brief Dtermine si la ville est une cohorte.
+	 * @brief Détermine si la ville est une cohorte.
 	 *
 	 * @return False, car nous sommes dans la classe mère.
 	 */
@@ -59,7 +59,25 @@ public:
 	 */
 	virtual void print(std::ostream& os) const;
 
+	/**
+	 * @brief Permet d'afficher la ville sur un flux (cout, fichier en écriture, etc.)
+	 *
+	 * @param os Le flux sur lequel écrire.
+	 * @param[in] city La ville.
+	 *
+	 * @return Une référence au flux utilisé.
+	 */
 	friend std::ostream& operator<<(std::ostream& os, const City& city);
+	/**
+	 * @brief Permet d'afficher la ville sur un flux (cout, fichier en écriture, etc.) de manière plus concise.
+	 * 
+	 * Cet affichage est principalement dédié à l'affichage des arbres de répartition des tubes.
+	 *
+	 * @param os Le flux sur lequel écrire.
+	 * @param[in] city Un pointeur sur la ville;
+	 *
+	 * @return Une référence au flux utilisé.
+	 */
 	friend std::ostream& operator<<(std::ostream& os, const City* city);
 	
 protected:

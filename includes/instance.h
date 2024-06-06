@@ -31,6 +31,7 @@ private:
 	 * Il s'agit d'un vecteur de pointeurs pour permettre le polymorphisme et donc l'inclusion des cohortes dans la liste.
 	 */
 	std::vector<City*> m_cities;
+	
 	/**
 	 * @brief Ce vecteur permet uniquement d'accéder plus vite aux cohortes.
 	 *  Il ne contient pas de nouvelles informations.

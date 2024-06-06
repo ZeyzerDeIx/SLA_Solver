@@ -1,8 +1,14 @@
-#include "tube.h"
+#include "cohort.h"
 
 using namespace std;
 
-Tube::Tube(int volume): m_volume(volume), m_usedVolume(0) {}
+Tube::Tube(Type& type, int volume):
+	m_type(type),
+	m_volume(volume),
+	m_usedVolume(0)
+{}
+
+Type& Tube::getType() {return m_type;}
 
 int Tube::getVolume() const {return m_volume;}
 
@@ -21,6 +27,6 @@ void Tube::consume(int volume)
 
 ostream& operator<<(ostream& os, const Tube& tube)
 {
-	os << tube.m_volume-tube.m_usedVolume << "/" << tube.m_volume << endl;
+	os << tube.m_volume-tube.m_usedVolume << "/" << tube.m_volume;
 	return os;
 }

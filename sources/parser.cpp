@@ -18,7 +18,7 @@ istringstream newLine(ifstream& file)
 Instance Parser::parseInstance(const string& fileLocation)
 {
     // Ouvrir le fichier en lecture
-    ifstream file(fileLocation);
+    ifstream file("data/instances/"+fileLocation);
     if (!file.is_open())
         throw runtime_error("Impossible d'ouvrir le fichier : " + fileLocation);
     
@@ -52,36 +52,41 @@ Instance Parser::parseInstance(const string& fileLocation)
     iss >> tubeCount;
     for(Cohort* cohortPtr : cohorts)
     {
-        vector<vector<Tube>> tubes;
+        vector<Type>& types = cohortPtr->getTypes();
         for(int i=0 ; i<typeCount ; i++)
         {
-            tubes.push_back(vector<Tube>());
+            types.emplace_back(*cohortPtr);
             iss = newLine(file);
             for(int volume ; iss >> volume;)
-                tubes[i].emplace_back(move(volume));
+                types[i].getTubes().emplace_back(types[i], volume);
         }
-        cohortPtr->setTubes(move(tubes));
     }
 
     vector<City*> cities;
     for(int i=0 ; i<cityCount ; i++)
     {
+        // On récupère la demande de la ville
         vector<int> demandes;
         iss = newLine(file);
         for(int demande; iss >> demande;)
-            demandes.emplace_back(move(demande));
+            demandes.emplace_back(demande);
+
+        // On regarde si la ville actuelle est une des cohortes
         Cohort* foundCohort = nullptr;
         for(Cohort* cohort: cohorts)
             if(*cohort == i)
                 foundCohort = cohort;
+        // Si on a trouvé une cohorte, on l'ajoute à la liste des villes et on lui ajoute ses demandes
         if(foundCohort != nullptr)
         {
             cities.push_back(foundCohort);
             foundCohort->setDemandes(move(demandes));
         }
+        // Sinon, on créer une nouvelle ville avec les demandes
         else cities.push_back(new City(i,move(demandes)));
     }
 
+    // Nombre max de congélations
     iss = newLine(file);
     int maxFreeze;
     iss >> maxFreeze;
@@ -90,8 +95,7 @@ Instance Parser::parseInstance(const string& fileLocation)
     file.close();
 
     
-    
     Instance instance(cities, cohorts, maxFreeze);
 
-    return instance; // Retourne l'instance déplacée*/
+    return instance;
 }

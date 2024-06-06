@@ -9,7 +9,7 @@ int main()
     cout << endl << "DEBUT DE L'EXECUTION" << endl << endl;
     auto start = chrono::steady_clock::now(); // Point A
 
-    Instance instance = Parser::parseInstance("instances/instance.txt");
+    Instance instance = Parser::parseInstance("instance.txt");
 
     
 
