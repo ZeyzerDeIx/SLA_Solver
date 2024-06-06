@@ -5,6 +5,10 @@ using namespace std;
 Type::Type(Cohort& cohort): m_cohort(cohort) {}
 Type::~Type() {}
 
+int Type::getId() {return m_id;}
+
+Cohort& Type::getCohort() {return m_cohort;}
+
 bool Type::operator==(const Type& other) {return m_id == other.m_id;}
 
 vector<Tube>& Type::getTubes() {return m_tubes;}

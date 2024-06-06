@@ -13,6 +13,10 @@ public:
 	Type(Cohort& cohort);
 	~Type();
 
+	int getId();
+
+	Cohort& getCohort();
+
 	/**
 	 * @brief Récupérer tous les tubes du type.
 	 *

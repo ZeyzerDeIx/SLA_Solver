@@ -38,6 +38,17 @@ const vector<Cohort*>& Instance::getCohorts() {return m_cohorts;}
 
 int Instance::getMaxFreeze() {return m_maxFreeze;}
 
+vector<Tube*> Instance::getAllTubes()
+{
+	vector<Tube*> tubes;
+	for(Cohort* cohortPtr: m_cohorts)
+		for(Type& type: cohortPtr->getTypes())
+			for(Tube& tube: type.getTubes())
+				tubes.push_back(&tube);
+
+	return tubes;
+}
+
 ostream& operator<<(ostream& os, const Instance& instance)
 {
 	os << "Instance: " << endl << endl;

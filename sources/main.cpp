@@ -10,7 +10,7 @@ int main()
     auto start = chrono::steady_clock::now(); // Point A
 
     Instance instance = Parser::parseInstance("instance.txt");
-
+    Solution solution = Parser::parseSolution("solution.txt", instance);
     
 
     auto end = chrono::steady_clock::now();   // Point B

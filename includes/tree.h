@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <vector>
+#include <functional>
 
 // Concept pour vérifier si T est un pointeur
 template<typename T>
@@ -93,18 +94,56 @@ public:
 	void setValue(T value) { m_value = value; }
 
 	/**
-     * @brief Récupère un vecteur de toutes les valeurs de l'arbre.
-     * 
-     * Cette méthode parcourt l'arbre entier et collecte toutes les valeurs dans un vecteur.
-     * 
-     * @return Un vecteur contenant toutes les valeurs de l'arbre.
-     */
-    std::vector<T> getAllValues() const
-    {
-        std::vector<T> values;
-        getAllValuesHelper(values);
-        return values;
-    }
+	 * @brief Récupère un vecteur de toutes les valeurs de l'arbre.
+	 * 
+	 * Cette méthode parcourt l'arbre entier et collecte toutes les valeurs dans un vecteur.
+	 * 
+	 * @return Un vecteur contenant toutes les valeurs de l'arbre.
+	 */
+	std::vector<T> getAllValues() const
+	{
+		std::vector<T> values;
+		getAllValuesHelper(values);
+		return values;
+	}
+
+	/**
+	 * @brief Permet de trouver un noeud/arbre contenant la valeure donnée en entrée.
+	 *
+	 * @param[in] value La valeure recherchée.
+	 *
+	 * @return Un pointeur sur le noeud trouver, nullptr si aucun noeud avec la bonne valeure n'a été trouvé.
+	 */
+	Tree* findNodeContaining(T value) const
+	{
+		if(value = m_value) return this;
+
+		Tree* found = nullptr;
+		for(Tree& tree: m_nodes)
+			if((found = tree.findNodeContaining(value)) != nullptr)
+				return found;
+
+		return nullptr;
+	}
+
+	/**
+	 * @brief Permet de trouver un noeud/arbre correspondant à une condition donnée en entrée.
+	 *
+	 * @param[in] predicate La condition de recherche sous forme de lambda.
+	 *
+	 * @return Un pointeur sur le noeud trouvé, nullptr si aucun noeud correspondant n'a été trouvé.
+	 */
+	Tree* findNodeMatching(const std::function<bool(Tree&)>& predicate)
+	{
+		if (predicate(*this)) return this;
+
+		Tree* found = nullptr;
+		for (Tree& tree : m_nodes)
+			if ((found = tree.findNodeMatching(predicate)) != nullptr)
+				return found;
+
+		return nullptr;
+	}
 
 	/**
 	 * @brief Surcharge de l'opérateur de sortie pour l'affichage de l'arbre.
@@ -125,17 +164,17 @@ private:
 	std::vector<Tree<T>> m_nodes; /**< Les noeuds enfants. */
 
 	/**
-     * @brief Fonction auxiliaire récursive pour collecter les valeurs de l'arbre.
-     * 
-     * @param values Référence au vecteur où les valeurs seront collectées.
-     */
-    void getAllValuesHelper(std::vector<T>& values) const
-    {
-        if(m_value != nullptr) values.push_back(m_value);
-        for (const Tree<T>& node : m_nodes) {
-            node.getAllValuesHelper(values);
-        }
-    }
+	 * @brief Fonction auxiliaire récursive pour collecter les valeurs de l'arbre.
+	 * 
+	 * @param values Référence au vecteur où les valeurs seront collectées.
+	 */
+	void getAllValuesHelper(std::vector<T>& values) const
+	{
+		if(m_value != nullptr) values.push_back(m_value);
+		for (const Tree<T>& node : m_nodes) {
+			node.getAllValuesHelper(values);
+		}
+	}
 
 	/**
 	 * @brief Affiche l'arbre avec un décalage d'indentation sur un flux de sortie.

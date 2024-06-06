@@ -65,9 +65,22 @@ public:
 	void consume(int volume);
 
 	/**
+	 * @brief Savoir si le tube est utilisé par sa cohorte.
+	 *
+	 * @return True si le tube est utilisé par sa cohorte, false sinon;
+	 */
+	bool getUsedByCohort();
+	/**
+	 * @brief Permet de définir le nouvel état de usedByCohort.
+	 *
+	 * @param[in] usedbyCohort le nouvel état.
+	 */
+	void setUsedByCohort(bool usedbyCohort);
+
+	/**
 	 * @brief Récupérer l'arbre de répartition du tube.
 	 *
-	 * @return     The tree.
+	 * @return Une référence à l'abre de répartition.
 	 */
 	Tree<City*>& getTree();
 
@@ -97,6 +110,11 @@ private:
 	 * @brief Le volume utilisé du tube.
 	 */
 	int m_usedVolume;
+
+	/**
+	 * @brief True si le tube est prélevé par la cohorte. False sinon.
+	 */
+	bool m_usedByCohort;
 
 	/**
 	 * @brief Arbre de répartition du tube.
