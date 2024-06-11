@@ -10,12 +10,12 @@
 class Type
 {
 public:
-	Type(Cohort& cohort);
+	Type(Cohort& cohort, int id);
 	~Type();
 
-	int getId();
+	int getId() const;
 
-	Cohort& getCohort();
+	const Cohort& getCohort() const;
 
 	/**
 	 * @brief Récupérer tous les tubes du type.
@@ -23,6 +23,15 @@ public:
 	 * @return Le vecteur contenant les tubes.
 	 */
 	std::vector<Tube>& getTubes();
+
+	/**
+	 * @brief Permet d'ajouter un tube au type.
+	 *
+	 * @param[in] tube Le tube à ajouter.
+	 * 
+	 * @return Une référence au tube ajouté.
+	 */
+	Tube& addTube(Tube tube);
 
 	/**
 	 * @brief Permet d'afficher du type sur un flux (cout, fichier en écriture, etc.)
@@ -48,14 +57,14 @@ private:
 	/**
 	 * @brief Référence à la cohorte du type.
 	 */
-	Cohort& m_cohort;
+	const Cohort& m_cohort;
 
 	/**
 	 * @brief L'identifiant du type.
 	 * 
 	 * Il est unique dans la cohorte du type mais pas dans l'ensemble de l'instance.
 	 */
-	int m_id;
+	const int m_id;
 
 	/**
 	 * @brief Liste des tubes rattachés au type.

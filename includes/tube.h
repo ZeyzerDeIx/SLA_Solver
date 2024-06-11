@@ -19,14 +19,23 @@ public:
 	 *
 	 * @param volume  Le volume contenu dans le tube.
 	 */
-	Tube(Type& type, int volume);
+	Tube(const Type& type, int volume);
+
+	/**
+	 * @brief Fait une copie profonde de l'arbre de répartition du tube.
+	 * 
+	 * La copie s'assure que les pointeurs de l'arbres pointes sur les villes de la bonne instance.
+	 *
+	 * @param tree L'arbre à copier.
+	 */
+	void deepTreeCopy(const Tree<const City*>& tree);
 
 	/**
 	 * @brief Récupérer le type auquel est rattaché le tube.
 	 *
 	 * @return Une référence au type.
 	 */
-	Type& getType();
+	const Type& getType() const;
 
 	/**
 	 * @brief Getter pour le volume contenu dans le tube.
@@ -82,7 +91,7 @@ public:
 	 *
 	 * @return Une référence à l'abre de répartition.
 	 */
-	Tree<City*>& getTree();
+	Tree<const City*>& getTree();
 
 	/**
 	 * @brief Permet d'afficher le tube sur un flux (cout, fichier en écriture, etc.)
@@ -99,7 +108,7 @@ private:
 	/**
 	 * @brief Type auquel est rattaché le tube.
 	 */
-	Type& m_type;
+	const Type& m_type;
 
 	/**
 	 * @brief Le volume contenu dans le tube.
@@ -123,5 +132,5 @@ private:
 	 * 
 	 * De cet arbre peuvent être déduis les arcs à enregistrer dans la solution.
 	 */
-	Tree<City*> m_tree;
+	Tree<const City*> m_tree;
 };

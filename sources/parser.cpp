@@ -56,14 +56,14 @@ Instance Parser::parseInstance(const string& fileLocation)
 		vector<Type>& types = cohortPtr->getTypes();
 		for(int i=0 ; i<typeCount ; i++)
 		{
-			types.emplace_back(*cohortPtr);
+			types.emplace_back(*cohortPtr, i);
 			iss = newLine(file);
 			for(int volume ; iss >> volume;)
 				types[i].getTubes().emplace_back(types[i], volume);
 		}
 	}
 
-	vector<City*> cities;
+	vector<unique_ptr<City>> cities;
 	for(int i=0 ; i<cityCount ; i++)
 	{
 		// On récupère la demande de la ville
@@ -74,17 +74,17 @@ Instance Parser::parseInstance(const string& fileLocation)
 
 		// On regarde si la ville actuelle est une des cohortes
 		Cohort* foundCohort = nullptr;
-		for(Cohort* cohort: cohorts)
-			if(*cohort == i)
-				foundCohort = cohort;
+		for(Cohort* cohortPtr: cohorts)
+			if(*cohortPtr == i)
+				foundCohort = cohortPtr;
 		// Si on a trouvé une cohorte, on l'ajoute à la liste des villes et on lui ajoute ses demandes
 		if(foundCohort != nullptr)
 		{
-			cities.push_back(foundCohort);
+			cities.push_back(unique_ptr<City>(foundCohort));
 			foundCohort->setDemandes(move(demandes));
 		}
 		// Sinon, on créer une nouvelle ville avec les demandes
-		else cities.push_back(new City(i,move(demandes)));
+		else cities.push_back(make_unique<City>(i,move(demandes)));
 	}
 
 	// Nombre max de congélations
@@ -97,6 +97,8 @@ Instance Parser::parseInstance(const string& fileLocation)
 
 	
 	Instance instance(cities, cohorts, maxFreeze);
+	for(Cohort* cohortPtr: cohorts)
+		cohortPtr->setInstance(instance);
 
 	return instance;
 }
@@ -104,29 +106,35 @@ Instance Parser::parseInstance(const string& fileLocation)
 
 void parseTubeTree(Tube& tube, ifstream& file, Instance& instance)
 {
+	cout << "Parsing tube: " << tube << endl;
 	// Nombre d'arc du tube
 	int arcCount;
 	newLine(file) >> arcCount;
+	cout << arcCount << endl;
 
 	// On lit tous les arcs pour les traiter par la suite
 	queue<array<int, 2>> arcs;
 	for(int x,y,i=0 ; i<arcCount ; i++)
 		newLine(file) >> x >> y, arcs.push(array<int, 2>{x,y});
 
-	Tree<City*>& tree = tube.getTree();
+	Tree<const City*>& tree = tube.getTree();
+	cout << "Tube:Type: " << tube.getType() << endl;
+	cout << tube.getType().getCohort() << endl;
 	tree.setValue(&tube.getType().getCohort());
+	cout << tree.getValue() << endl;
 	while(!arcs.empty())
 	{
 		array<int, 2>& arc = arcs.front();
-		Tree<City*>* node = tree.findNodeMatching(
-			[&arc](Tree<City*>& node){
+		cout << arc[0] << " -> " << arc[1] << endl;
+		Tree<const City*>* node = tree.findNodeMatching(
+			[&arc](const auto& node){
 				return node.getValue()->getId() == arc[0];
 			});
 		
 		if(node != nullptr)
-			for(City* cityPtr: instance.getCities())
+			for(const auto& cityPtr: instance.getCities())
 				if(cityPtr->getId() == arc[1])
-					node->addNode(cityPtr);
+					node->addNode(cityPtr.get());
 		else arcs.push(arcs.front());
 
 		arcs.pop();
@@ -141,20 +149,24 @@ Solution Parser::parseSolution(const string& fileLocation, Instance instance)
 		throw runtime_error("Impossible d'ouvrir le fichier : " + fileLocation);
 
 	istringstream iss;
+	int n=0;
 	for(Cohort* cohortPtr: instance.getCohorts())
 		for(Type& type: cohortPtr->getTypes())
-			for((iss = newLine(file)).ignore(8); Tube& tube: type.getTubes())
-				for(int n; iss >> n;)
+			for(Tube& tube: type.getTubes())
+				for((iss = newLine(file)).ignore(8); iss >> n;)
 					if(n == cohortPtr->getId())
 						tube.setUsedByCohort(true);
 
 	for(Cohort* cohortPtr: instance.getCohorts())
 		for(Type& type: cohortPtr->getTypes())
-			for(iss = newLine(file); Tube& tube: type.getTubes())
+			for(Tube& tube: type.getTubes())
 				parseTubeTree(tube, file, instance);
 
 	// Fermer le fichier
 	file.close();
+
+	for(Tube* tubePtr: instance.getAllTubes())
+			cout << tubePtr->getTree() << endl;
 
 	return Solution(instance);
 }

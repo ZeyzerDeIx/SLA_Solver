@@ -54,4 +54,4 @@ else
 	@rm -rf $(OBJECTS)
 endif
 
-.PHONY: all build buildAndRun clean cleanBuildAndRun run
+.PHONY: all build clean run

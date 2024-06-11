@@ -1,15 +1,33 @@
 #include "cohort.h"
+#include "instance.h"
 
 using namespace std;
 
-Tube::Tube(Type& type, int volume):
+Tube::Tube(const Type& type, int volume):
 	m_type(type),
 	m_volume(volume),
 	m_usedVolume(0),
 	m_usedByCohort(false)
 {}
 
-Type& Tube::getType() {return m_type;}
+void deepTreeCopyHelper(const Tree<const City*>& treeSrc, Tree<const City*>& treeDst, const vector<unique_ptr<City>>& cities)
+{
+	for(const auto& nextTree: treeSrc.getNodes())
+		deepTreeCopyHelper(nextTree, treeDst.addNode(nullptr), cities);
+	treeDst.setValue(nullptr);
+	if(treeSrc.getValue() == nullptr) return;
+
+	for(const auto& cityPtr: cities)
+		if(cityPtr->getId() == treeSrc.getValue()->getId())
+			treeDst.setValue(cityPtr.get());
+}
+void Tube::deepTreeCopy(const Tree<const City*>& tree)
+{
+	const auto& cities = m_type.getCohort().getInstance().getCities();
+	deepTreeCopyHelper(tree, m_tree, cities);
+}
+
+const Type& Tube::getType() const {return m_type;}
 
 int Tube::getVolume() const {return m_volume;}
 
@@ -23,7 +41,7 @@ void Tube::consume(int volume) {m_usedVolume += volume;}
 bool Tube::getUsedByCohort() {return m_usedByCohort;}
 void Tube::setUsedByCohort(bool usedbyCohort) {m_usedByCohort = usedbyCohort;}
 
-Tree<City*>& Tube::getTree() {return m_tree;}
+Tree<const City*>& Tube::getTree() {return m_tree;}
 
 ostream& operator<<(ostream& os, const Tube& tube)
 {

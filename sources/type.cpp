@@ -2,20 +2,29 @@
 
 using namespace std;
 
-Type::Type(Cohort& cohort): m_cohort(cohort) {}
+Type::Type(Cohort& cohort, int id):
+	m_cohort(cohort),
+	m_id(id)
+{}
 Type::~Type() {}
 
-int Type::getId() {return m_id;}
+int Type::getId() const {return m_id;}
 
-Cohort& Type::getCohort() {return m_cohort;}
+const Cohort& Type::getCohort() const {return m_cohort;}
 
 bool Type::operator==(const Type& other) {return m_id == other.m_id;}
 
 vector<Tube>& Type::getTubes() {return m_tubes;}
+Tube& Type::addTube(Tube tube)
+{
+	m_tubes.push_back(tube);
+	return m_tubes.back();
+}
 
 ostream& operator<<(ostream& os, const Type& type)
 {
 	os << "Type n° " << type.m_id << " :" << endl;
+	cout << "size: " << type.m_tubes.size() << endl;
 	for(const Tube& tube: type.m_tubes)
 		os << tube << endl;
 	return os;

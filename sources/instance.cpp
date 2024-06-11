@@ -2,8 +2,10 @@
 
 using namespace std;
 
-Instance::Instance(vector<City*> &cities, vector<Cohort*> &cohorts, int maxFreeze):
-	m_cities(cities),
+Instance::Instance() {}
+
+Instance::Instance(vector<unique_ptr<City>> &cities, vector<Cohort*> &cohorts, int maxFreeze):
+	m_cities(move(cities)),
 	m_cohorts(cohorts),
 	m_maxFreeze(maxFreeze)
 {}
@@ -14,26 +16,26 @@ Instance::Instance(const Instance& other): m_cities(other.m_cities.size()), m_ma
     // Copie des villes
     for (size_t i = 0; i < other.m_cities.size(); ++i)
     {
-    	if(Cohort* cohortPtr = dynamic_cast<Cohort*>(other.m_cities[i]))
+    	if(Cohort* cohortPtr = dynamic_cast<Cohort*>(other.m_cities[i].get()))
     	{
-    		Cohort* newCohortPtr = new Cohort(*(cohortPtr));
+    		Cohort* newCohortPtr = new Cohort(*this,*cohortPtr);
     		cohorts.push_back(newCohortPtr);
-    		m_cities[i] = newCohortPtr;
+    		m_cities[i] = unique_ptr<City>(newCohortPtr);
     	}
-    	else m_cities[i] = new City(*(other.m_cities[i]));
+    	else m_cities[i] = make_unique<City>(*(other.m_cities[i]));
     }
+
+    for(Cohort* cohortPtr: cohorts)
+    	for(Type& type: cohortPtr->getTypes())
+				cout << "Le type bourré, id: " << type.getTubes().back().getType().getId() << " adresse: " << &type.getTubes().back().getType() << endl;
+
     for(Cohort* cohortPtr: other.m_cohorts)
     	for(Cohort* cohortPtr2: cohorts)
     		if(cohortPtr->getId() == cohortPtr2->getId())
     			m_cohorts.push_back(cohortPtr2);
 }
 
-Instance::~Instance()
-{
-	for (City* cityPtr : m_cities) delete cityPtr;
-}
-
-const vector<City*>& Instance::getCities() {return m_cities;}
+const vector<unique_ptr<City>>& Instance::getCities() const {return m_cities;}
 const vector<Cohort*>& Instance::getCohorts() {return m_cohorts;}
 
 int Instance::getMaxFreeze() {return m_maxFreeze;}
@@ -52,10 +54,9 @@ vector<Tube*> Instance::getAllTubes()
 ostream& operator<<(ostream& os, const Instance& instance)
 {
 	os << "Instance: " << endl << endl;
-	for (City* cityPtr : instance.m_cities)
+	for (const auto& cityPtr : instance.m_cities)
 	{
-		cityPtr->print(os);
-		os << endl;
+		cityPtr->print(os) << endl;
 	}
 	return os;
 }

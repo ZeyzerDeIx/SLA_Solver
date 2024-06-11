@@ -69,7 +69,7 @@ public:
 	 *
 	 * @return Une référence au vecteur des nœuds de l'arbre. Chaque nœud est de type Tree<T>.
 	 */
-	std::vector<Tree<T>>& getNodes() {return m_nodes;}
+	const std::vector<Tree<T>>& getNodes() const {return m_nodes;}
 
 
 	/**
@@ -84,7 +84,7 @@ public:
 	 *
 	 * @return La valeur de l'objet.
 	 */
-	T getValue() { return m_value; }
+	T getValue() const { return m_value; }
 
 	/**
 	 * @brief Définit la valeur de l'objet.

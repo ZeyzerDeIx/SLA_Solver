@@ -43,7 +43,7 @@ public:
 	 *
 	 * @return L'id.
 	 */
-	int getId();
+	int getId() const;
 
 	/**
 	 * @brief Détermine si la ville est une cohorte.
@@ -57,7 +57,7 @@ public:
 	 *
 	 * @param os Le flux de sortie.
 	 */
-	virtual void print(std::ostream& os) const;
+	virtual std::ostream& print(std::ostream& os) const;
 
 	/**
 	 * @brief Permet d'afficher la ville sur un flux (cout, fichier en écriture, etc.)

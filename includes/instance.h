@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cohort.h"
+#include <memory>
 
 /**
  * @brief Cette classe modélise une instance.
@@ -13,32 +14,30 @@ class Instance
 {
 public:
 	/**
+	 * @brief Constructeur par défaut.
+	 */
+	Instance();
+	/**
 	 * @brief Constructeur.
 	 *
 	 * @param cities Vecteur de pointeurs sur les villes de l'instance.
 	 * @param cohorts Vecteur de pointeurs sur les cohortes de l'instance.
 	 * @param maxFreeze Le nombre maximum de congélations par tube.
 	 */
-	Instance(std::vector<City*> &cities, std::vector<Cohort*> &cohorts, int maxFreeze);
+	Instance(std::vector<std::unique_ptr<City>> &cities, std::vector<Cohort*> &cohorts, int maxFreeze);
 	/**
 	 * @brief Constructeur de copie.
 	 *
 	 * @param[in] other L'instance à copier.
 	 */
 	Instance(const Instance& other);
-	/**
-	 * @brief Destructeur de l'objet.
-	 * 
-	 * Détruit les villes pour libérer la mémoire.
-	 */
-	~Instance();
 
 	/**
 	 * @brief Récupérer les villes.
 	 *
 	 * @return Une référence à un vecteur de pointeurs sur les villes.
 	 */
-	const std::vector<City*>& getCities();
+	const std::vector<std::unique_ptr<City>>& getCities() const;
 	/**
 	 * @brief Récupérer les cohortes.
 	 *
@@ -76,7 +75,7 @@ private:
 	 * 
 	 * Il s'agit d'un vecteur de pointeurs pour permettre le polymorphisme et donc l'inclusion des cohortes dans la liste.
 	 */
-	std::vector<City*> m_cities;
+	std::vector<std::unique_ptr<City>> m_cities;
 
 	/**
 	 * @brief Ce vecteur permet uniquement d'accéder plus vite aux cohortes.
