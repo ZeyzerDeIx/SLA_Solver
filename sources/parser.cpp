@@ -106,11 +106,9 @@ Instance Parser::parseInstance(const string& fileLocation)
 
 void parseTubeTree(Tube& tube, ifstream& file, Instance& instance)
 {
-	cout << "Parsing tube: " << tube << endl;
 	// Nombre d'arc du tube
 	int arcCount;
 	newLine(file) >> arcCount;
-	cout << "Arc count: " << arcCount << endl;
 
 	// On lit tous les arcs pour les traiter par la suite
 	queue<array<int, 2>> arcs;
@@ -118,25 +116,25 @@ void parseTubeTree(Tube& tube, ifstream& file, Instance& instance)
 		newLine(file) >> x >> y, arcs.push(array<int, 2>{x,y});
 
 	Tree<const City*>& tree = tube.getTree();
-	cout << "cohort: " << endl << tube.getType().getCohort() << endl;
 	tree.setValue(&tube.getType().getCohort());
-	cout << "tree value: " << tree.getValue() << endl;
-	while(!arcs.empty())
+	
+	// Ici la limite sert à s'assurer qu'en cas de problème (ex arc non relié à la cohorte), on ne se retrouve pas dans une boucle infinie
+	for(int limit = arcs.size()*2; !arcs.empty() && limit > 0; limit--)
 	{
 		array<int, 2>& arc = arcs.front();
-		cout << arc[0] << " -> " << arc[1] << endl;
 		Tree<const City*>* node = tree.findNodeMatching(
-			[&arc](const auto& node)
+			[&origin = arc[0]](const auto& node)
 			{
-				return node.getValue()->getId() == arc[0];
+				return node.getValue()->getId() == origin;
 			}
 		);
 		
-		if(node != nullptr)
+		if(node == nullptr)
+			arcs.push(arcs.front());
+		else
 			for(const auto& cityPtr: instance.getCities())
 				if(cityPtr->getId() == arc[1])
 					node->addNode(cityPtr.get());
-		else arcs.push(arcs.front());
 
 		arcs.pop();
 	}

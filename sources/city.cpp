@@ -28,7 +28,6 @@ ostream& operator<<(ostream& os, const City& city)
 ostream& operator<<(ostream& os, const City* city)
 {
 	if(city == nullptr)
-		os << "nullptr";
-	else os << city;
-	return os;
+		return os << "nullptr";
+	return os << city->getId();
 }
