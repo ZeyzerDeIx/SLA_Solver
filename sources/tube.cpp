@@ -10,7 +10,7 @@ Tube::Tube(const Type& type, int volume):
 	m_usedByCohort(false)
 {}
 
-void deepTreeCopyHelper(const Tree<const City*>& treeSrc, Tree<const City*>& treeDst, const vector<unique_ptr<City>>& cities)
+void deepTreeCopyHelper(const Tree<const City*>& treeSrc, Tree<const City*>& treeDst, const list<unique_ptr<City>>& cities)
 {
 	for(const auto& nextTree: treeSrc.getNodes())
 		deepTreeCopyHelper(nextTree, treeDst.addNode(nullptr), cities);

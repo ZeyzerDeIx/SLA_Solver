@@ -2,11 +2,12 @@
 
 using namespace std;
 
-Type::Type(Cohort& cohort, int id):
+Type::Type(const Cohort& cohort, int id):
 	m_cohort(cohort),
 	m_id(id)
 {}
-Type::~Type() {}
+Type::~Type()
+{}
 
 int Type::getId() const {return m_id;}
 
@@ -14,7 +15,7 @@ const Cohort& Type::getCohort() const {return m_cohort;}
 
 bool Type::operator==(const Type& other) {return m_id == other.m_id;}
 
-vector<Tube>& Type::getTubes() {return m_tubes;}
+list<Tube>& Type::getTubes() {return m_tubes;}
 Tube& Type::addTube(Tube tube)
 {
 	m_tubes.push_back(tube);

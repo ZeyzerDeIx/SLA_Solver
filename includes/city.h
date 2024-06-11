@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include <vector>
+#include <list>
 #include <iostream>
 
 /**
@@ -22,21 +22,21 @@ public:
 	 * @param[in] id L'identifiant de la ville.
 	 * @param[in] demandes Les demandes de la ville.
 	 */
-	City(int id, std::vector<int> demandes);
+	City(int id, std::list<int> demandes);
 
 	/**
 	 * @brief Permet de récupérer la liste des demandes de la ville.
 	 *
 	 * @return Les demandes.
 	 */
-	const std::vector<int>& getDemandes();
+	const std::list<int>& getDemandes();
 
 	/**
 	 * @brief Définit les demandes de la ville.
 	 *
 	 * @param[in] demandes Les demandes.
 	 */
-	void setDemandes(std::vector<int> demandes);
+	void setDemandes(std::list<int> demandes);
 
 	/**
 	 * @brief Retourne l'identifiant de la ville.
@@ -88,5 +88,5 @@ protected:
 	/**
 	 * @brief Demandes de la ville par type de tube.
 	 */
-	std::vector<int> m_demandes;
+	std::list<int> m_demandes;
 };

@@ -4,30 +4,26 @@ using namespace std;
 
 Instance::Instance() {}
 
-Instance::Instance(vector<unique_ptr<City>> &cities, vector<Cohort*> &cohorts, int maxFreeze):
+Instance::Instance(list<unique_ptr<City>> &cities, list<Cohort*> &cohorts, int maxFreeze):
 	m_cities(move(cities)),
 	m_cohorts(cohorts),
 	m_maxFreeze(maxFreeze)
 {}
 
-Instance::Instance(const Instance& other): m_cities(other.m_cities.size()), m_maxFreeze(other.m_maxFreeze)
+Instance::Instance(const Instance& other): m_cities(), m_maxFreeze(other.m_maxFreeze)
 {
-	vector<Cohort*> cohorts;
+	list<Cohort*> cohorts;
     // Copie des villes
-    for (size_t i = 0; i < other.m_cities.size(); ++i)
+    for (const auto& cityPtr: other.m_cities)
     {
-    	if(Cohort* cohortPtr = dynamic_cast<Cohort*>(other.m_cities[i].get()))
+    	if(Cohort* cohortPtr = dynamic_cast<Cohort*>(cityPtr.get()))
     	{
     		Cohort* newCohortPtr = new Cohort(*this,*cohortPtr);
     		cohorts.push_back(newCohortPtr);
-    		m_cities[i] = unique_ptr<City>(newCohortPtr);
+    		m_cities.push_back(unique_ptr<City>(newCohortPtr));
     	}
-    	else m_cities[i] = make_unique<City>(*(other.m_cities[i]));
+    	else m_cities.push_back(make_unique<City>(*cityPtr));
     }
-
-    for(Cohort* cohortPtr: cohorts)
-    	for(Type& type: cohortPtr->getTypes())
-				cout << "Le type bourré, id: " << type.getTubes().back().getType().getId() << " adresse: " << &type.getTubes().back().getType() << endl;
 
     for(Cohort* cohortPtr: other.m_cohorts)
     	for(Cohort* cohortPtr2: cohorts)
@@ -35,14 +31,14 @@ Instance::Instance(const Instance& other): m_cities(other.m_cities.size()), m_ma
     			m_cohorts.push_back(cohortPtr2);
 }
 
-const vector<unique_ptr<City>>& Instance::getCities() const {return m_cities;}
-const vector<Cohort*>& Instance::getCohorts() {return m_cohorts;}
+const list<unique_ptr<City>>& Instance::getCities() const {return m_cities;}
+const list<Cohort*>& Instance::getCohorts() {return m_cohorts;}
 
 int Instance::getMaxFreeze() {return m_maxFreeze;}
 
-vector<Tube*> Instance::getAllTubes()
+list<Tube*> Instance::getAllTubes()
 {
-	vector<Tube*> tubes;
+	list<Tube*> tubes;
 	for(Cohort* cohortPtr: m_cohorts)
 		for(Type& type: cohortPtr->getTypes())
 			for(Tube& tube: type.getTubes())

@@ -38,7 +38,7 @@ Instance Parser::parseInstance(const string& fileLocation)
 
 	// Taille des cohortes
 	iss = newLine(file);
-	vector<Cohort*> cohorts;
+	list<Cohort*> cohorts;
 	for(int size; iss >> size; cohortIds.pop())
 		cohorts.push_back(new Cohort(cohortIds.front(), size));
 
@@ -53,21 +53,21 @@ Instance Parser::parseInstance(const string& fileLocation)
 	iss >> tubeCount;
 	for(Cohort* cohortPtr : cohorts)
 	{
-		vector<Type>& types = cohortPtr->getTypes();
+		list<Type>& types = cohortPtr->getTypes();
 		for(int i=0 ; i<typeCount ; i++)
 		{
 			types.emplace_back(*cohortPtr, i);
 			iss = newLine(file);
 			for(int volume ; iss >> volume;)
-				types[i].getTubes().emplace_back(types[i], volume);
+				types.back().getTubes().emplace_back(types.back(), volume);
 		}
 	}
 
-	vector<unique_ptr<City>> cities;
+	list<unique_ptr<City>> cities;
 	for(int i=0 ; i<cityCount ; i++)
 	{
 		// On récupère la demande de la ville
-		vector<int> demandes;
+		list<int> demandes;
 		iss = newLine(file);
 		for(int demande; iss >> demande;)
 			demandes.emplace_back(demande);
@@ -110,7 +110,7 @@ void parseTubeTree(Tube& tube, ifstream& file, Instance& instance)
 	// Nombre d'arc du tube
 	int arcCount;
 	newLine(file) >> arcCount;
-	cout << arcCount << endl;
+	cout << "Arc count: " << arcCount << endl;
 
 	// On lit tous les arcs pour les traiter par la suite
 	queue<array<int, 2>> arcs;
@@ -118,18 +118,19 @@ void parseTubeTree(Tube& tube, ifstream& file, Instance& instance)
 		newLine(file) >> x >> y, arcs.push(array<int, 2>{x,y});
 
 	Tree<const City*>& tree = tube.getTree();
-	cout << "Tube:Type: " << tube.getType() << endl;
-	cout << tube.getType().getCohort() << endl;
+	cout << "cohort: " << endl << tube.getType().getCohort() << endl;
 	tree.setValue(&tube.getType().getCohort());
-	cout << tree.getValue() << endl;
+	cout << "tree value: " << tree.getValue() << endl;
 	while(!arcs.empty())
 	{
 		array<int, 2>& arc = arcs.front();
 		cout << arc[0] << " -> " << arc[1] << endl;
 		Tree<const City*>* node = tree.findNodeMatching(
-			[&arc](const auto& node){
+			[&arc](const auto& node)
+			{
 				return node.getValue()->getId() == arc[0];
-			});
+			}
+		);
 		
 		if(node != nullptr)
 			for(const auto& cityPtr: instance.getCities())

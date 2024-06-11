@@ -17,8 +17,7 @@ Cohort::Cohort(Instance& instance, Cohort& other):
 	for(Type& type: other.m_types)
 	{
 		// On ajoute un nouveau type qui est une copie partielle du type actuel de other. Ce type ne contient pas les tubes c'est pourquoi on en récupère une référence.
-		Type& newType = addType(Type(*this, type.getId()));
-		cout << "New type a pour id: " << newType.getId() << " et pour adresse: " << &newType << endl;
+		Type& newType = m_types.emplace_back(*this,type.getId());
 		// Maintenant on copie les tubes.
 		for(Tube& tube: type.getTubes())
 		{
@@ -35,12 +34,7 @@ void Cohort::setInstance(Instance& instance) {m_instance=&instance;}
 
 int Cohort::getSize() {return m_size;}
 
-vector<Type>& Cohort::getTypes() {return m_types;}
-Type& Cohort::addType(Type type)
-{
-	m_types.push_back(type);
-	return m_types.back();
-}
+list<Type>& Cohort::getTypes() {return m_types;}
 
 bool Cohort::isCohort() {return true;}
 
@@ -48,8 +42,8 @@ ostream& Cohort::print(ostream& os) const
 {
 	os << "Cohort: id: " << m_id << " size: " << m_size << endl;
 	os << "Demandes:" << endl;
-	for(int i=0 ; i<m_demandes.size() ; i++)
-		os << "Type " << i << " : " << m_demandes[i] << endl;
+	for(int i=0 ; int demande: m_demandes)
+		os << "Type " << i++ << " : " << demande << endl;
 	os << "Types:" << endl;
 	for(const Type& type: m_types)
 		os << type << endl;

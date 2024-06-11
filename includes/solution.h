@@ -29,7 +29,7 @@ private:
 	 * 
 	 * Il s'agit de pointeurs car ils pointent vers les tubes de l'instance en réalité, l'idée ici c'est de se passer d'une double boucle cohortes types et d'accéder directement aux arbres.
 	 */
-	std::vector<Tube*> m_tubes;
+	std::list<Tube*> m_tubes;
 	/**
 	 * @brief Nombre total d'alicotages de la solution.
 	 * 

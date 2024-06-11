@@ -1,5 +1,5 @@
 #pragma once
-#include <vector>
+#include <list>
 #include "tube.h"
 
 /**
@@ -10,7 +10,7 @@
 class Type
 {
 public:
-	Type(Cohort& cohort, int id);
+	Type(const Cohort& cohort, int id);
 	~Type();
 
 	int getId() const;
@@ -22,7 +22,7 @@ public:
 	 *
 	 * @return Le vecteur contenant les tubes.
 	 */
-	std::vector<Tube>& getTubes();
+	std::list<Tube>& getTubes();
 
 	/**
 	 * @brief Permet d'ajouter un tube au type.
@@ -69,5 +69,5 @@ private:
 	/**
 	 * @brief Liste des tubes rattachés au type.
 	 */
-	std::vector<Tube> m_tubes;
+	std::list<Tube> m_tubes;
 };

@@ -24,7 +24,7 @@ public:
 	 * @param cohorts Vecteur de pointeurs sur les cohortes de l'instance.
 	 * @param maxFreeze Le nombre maximum de congélations par tube.
 	 */
-	Instance(std::vector<std::unique_ptr<City>> &cities, std::vector<Cohort*> &cohorts, int maxFreeze);
+	Instance(std::list<std::unique_ptr<City>> &cities, std::list<Cohort*> &cohorts, int maxFreeze);
 	/**
 	 * @brief Constructeur de copie.
 	 *
@@ -37,13 +37,13 @@ public:
 	 *
 	 * @return Une référence à un vecteur de pointeurs sur les villes.
 	 */
-	const std::vector<std::unique_ptr<City>>& getCities() const;
+	const std::list<std::unique_ptr<City>>& getCities() const;
 	/**
 	 * @brief Récupérer les cohortes.
 	 *
 	 * @return Une référence à un vecteur de pointeurs sur les cohortes.
 	 */
-	const std::vector<Cohort*>& getCohorts();
+	const std::list<Cohort*>& getCohorts();
 
 	/**
 	 * @brief Récupérer le nombre maximum de congélations de l'instance.
@@ -57,7 +57,7 @@ public:
 	 *
 	 * @return Vecteur de pointeur sur les tubes.
 	 */
-	std::vector<Tube*> getAllTubes();
+	std::list<Tube*> getAllTubes();
 
 	/**
 	 * @brief Permet d'afficher l'instance sur un flux (cout, fichier en écriture, etc.)
@@ -75,13 +75,13 @@ private:
 	 * 
 	 * Il s'agit d'un vecteur de pointeurs pour permettre le polymorphisme et donc l'inclusion des cohortes dans la liste.
 	 */
-	std::vector<std::unique_ptr<City>> m_cities;
+	std::list<std::unique_ptr<City>> m_cities;
 
 	/**
 	 * @brief Ce vecteur permet uniquement d'accéder plus vite aux cohortes.
 	 *  Il ne contient pas de nouvelles informations.
 	 */
-	std::vector<Cohort*> m_cohorts;
+	std::list<Cohort*> m_cohorts;
 
 	/**
 	 * @brief Le nombre maximum de congélations par tube.

@@ -58,16 +58,16 @@ public:
 	 *
 	 * @return Une référence au vecteur des types de la cohorte.
 	 */
-	std::vector<Type>& getTypes();
+	std::list<Type>& getTypes();
 
 	/**
 	 * @brief Permet d'ajouter un type à la cohorte.
 	 *
-	 * @param[in] type Le type à ajouter.
+	 * @param[in] id L'id du type à ajouter.
 	 * 
 	 * @return Une référence au type ajouté.
 	 */
-	Type& addType(Type type);
+	Type& addType(int id);
 
 	/**
 	 * @brief Détermine si la ville est une cohorte.
@@ -120,5 +120,5 @@ private:
 	 * 
 	 * Ils contiennent les tubes.
 	 */
-	std::vector<Type> m_types;
+	std::list<Type> m_types;
 };
