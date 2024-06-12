@@ -21,7 +21,7 @@ public:
 	 *
 	 * @return Le nombre max d'aliquotages.
 	 */
-	int getMaxAliquo() const;
+	unsigned int getMaxAliquo() const;
 
 	friend std::ostream& operator<<(std::ostream& os, const Solution& solution);
 

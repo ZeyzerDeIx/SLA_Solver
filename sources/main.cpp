@@ -10,7 +10,9 @@ int main()
     auto start = chrono::steady_clock::now(); // Point A
 
     Instance instance = Parser::parseInstance("instance2.txt");
-    Solution solution = Parser::parseSolution("solution.txt", instance);    
+    Solution solution = Parser::parseSolution("solution.txt", instance);
+
+    cout << solution.getMaxAliquo() << endl;
 
     auto end = chrono::steady_clock::now();   // Point B
     chrono::duration<double> elapsed_seconds = end - start;

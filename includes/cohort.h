@@ -51,7 +51,7 @@ public:
 	 *
 	 * @return La taille.
 	 */
-	int getSize();
+	int getSize() const;
 
 	/**
 	 * @brief Récupérer la liste des types de la cohorte.

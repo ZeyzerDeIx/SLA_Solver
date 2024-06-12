@@ -32,7 +32,7 @@ Cohort::Cohort(Instance& instance, Cohort& other):
 const Instance& Cohort::getInstance() const {return *m_instance;}
 void Cohort::setInstance(Instance& instance) {m_instance=&instance;}
 
-int Cohort::getSize() {return m_size;}
+int Cohort::getSize() const {return m_size;}
 
 list<Type>& Cohort::getTypes() {return m_types;}
 const list<Type>& Cohort::getTypes() const {return m_types;}
