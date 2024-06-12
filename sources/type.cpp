@@ -16,6 +16,7 @@ const Cohort& Type::getCohort() const {return m_cohort;}
 bool Type::operator==(const Type& other) {return m_id == other.m_id;}
 
 list<Tube>& Type::getTubes() {return m_tubes;}
+const list<Tube>& Type::getTubes() const {return m_tubes;}
 Tube& Type::addTube(Tube tube)
 {
 	m_tubes.push_back(tube);

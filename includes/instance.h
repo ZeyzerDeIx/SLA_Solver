@@ -50,7 +50,7 @@ public:
 	 *
 	 * @return Une référence à un vecteur de pointeurs sur les cohortes.
 	 */
-	const std::list<Cohort*>& getCohorts();
+	const std::list<Cohort*>& getCohorts() const;
 
 	/**
 	 * @brief Récupérer le nombre maximum de congélations de l'instance.

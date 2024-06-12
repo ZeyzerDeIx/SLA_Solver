@@ -61,6 +61,16 @@ public:
 	std::list<Type>& getTypes();
 
 	/**
+	 * @brief Récupérer la liste (const) des types de la cohorte.
+	 *
+	 * @return Une référence constante au vecteur des types de la cohorte.
+	 * 
+	 * \note
+	 * Variante constante.
+	 */
+	const std::list<Type>& getTypes() const;
+
+	/**
 	 * @brief Permet d'ajouter un type à la cohorte.
 	 *
 	 * @param[in] id L'id du type à ajouter.

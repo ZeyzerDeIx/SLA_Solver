@@ -35,6 +35,7 @@ void Cohort::setInstance(Instance& instance) {m_instance=&instance;}
 int Cohort::getSize() {return m_size;}
 
 list<Type>& Cohort::getTypes() {return m_types;}
+const list<Type>& Cohort::getTypes() const {return m_types;}
 
 bool Cohort::isCohort() {return true;}
 

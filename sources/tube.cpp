@@ -45,6 +45,7 @@ bool Tube::getUsedByCohort() {return m_usedByCohort;}
 void Tube::setUsedByCohort(bool usedbyCohort) {m_usedByCohort = usedbyCohort;}
 
 Tree<const City*>& Tube::getTree() {return m_tree;}
+const Tree<const City*>& Tube::getTree() const {return m_tree;}
 
 ostream& operator<<(ostream& os, const Tube& tube)
 {

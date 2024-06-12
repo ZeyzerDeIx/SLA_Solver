@@ -41,7 +41,7 @@ Instance::Instance(Instance&& other) noexcept :
 
 
 const list<unique_ptr<City>>& Instance::getCities() const {return m_cities;}
-const list<Cohort*>& Instance::getCohorts() {return m_cohorts;}
+const list<Cohort*>& Instance::getCohorts() const {return m_cohorts;}
 
 int Instance::getMaxFreeze() {return m_maxFreeze;}
 

@@ -18,11 +18,20 @@ public:
 	const Cohort& getCohort() const;
 
 	/**
-	 * @brief Récupérer tous les tubes du type.
+	 * @brief Récupérer la liste des tubes du type.
 	 *
-	 * @return Le vecteur contenant les tubes.
+	 * @return Une référence à liste des tubes.
 	 */
 	std::list<Tube>& getTubes();
+	/**
+	 * @brief Récupérer la liste (const) des tubes du type.
+	 *
+	 * @return Une référence constante à la liste des tubes.
+	 * 
+	 * \note
+	 * Variante constante.
+	 */
+	const std::list<Tube>& getTubes() const;
 
 	/**
 	 * @brief Permet d'ajouter un tube au type.

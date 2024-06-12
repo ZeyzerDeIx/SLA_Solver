@@ -101,6 +101,16 @@ public:
 	Tree<const City*>& getTree();
 
 	/**
+	 * @brief Récupérer l'arbre de répartition du tube (const).
+	 *
+	 * @return Une référence à l'abre de répartition.
+	 * 
+	 * \note
+	 * Variante constante.
+	 */
+	const Tree<const City*>& getTree() const;
+
+	/**
 	 * @brief Permet d'afficher le tube sur un flux (cout, fichier en écriture, etc.)
 	 *
 	 * @param os Le flux sur lequel écrire.

@@ -77,7 +77,7 @@ public:
 	 *
 	 * @return Le nombre de noeuds.
 	 */
-	int nodeCount() { return m_nodes.size(); }
+	int nodeCount() const { return m_nodes.size(); }
 
 	/**
 	 * @brief Récupère la valeur de l'objet.
