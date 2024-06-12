@@ -3,8 +3,9 @@
 
 using namespace std;
 
-Tube::Tube(const Type& type, int volume):
+Tube::Tube(const Type& type, int volume, int id):
 	m_type(type),
+	m_id(id),
 	m_volume(volume),
 	m_usedVolume(0),
 	m_usedByCohort(false)
@@ -28,6 +29,8 @@ void Tube::deepTreeCopy(const Tree<const City*>& tree)
 }
 
 const Type& Tube::getType() const {return m_type;}
+
+int Tube::getId() const {return m_id;}
 
 int Tube::getVolume() const {return m_volume;}
 

@@ -19,7 +19,7 @@ public:
 	 *
 	 * @param volume  Le volume contenu dans le tube.
 	 */
-	Tube(const Type& type, int volume);
+	Tube(const Type& type, int volume, int id);
 
 	/**
 	 * @brief Fait une copie profonde de l'arbre de répartition du tube.
@@ -36,6 +36,13 @@ public:
 	 * @return Une référence au type.
 	 */
 	const Type& getType() const;
+
+	/**
+	 * @brief Récupérer l'identifiant du tube.
+	 *
+	 * @return L'identifiant.
+	 */
+	int getId() const;
 
 	/**
 	 * @brief Getter pour le volume contenu dans le tube.
@@ -109,6 +116,11 @@ private:
 	 * @brief Type auquel est rattaché le tube.
 	 */
 	const Type& m_type;
+
+	/**
+	 * @brief Identifiant du tube dans le type.
+	 */
+	int m_id;
 
 	/**
 	 * @brief Le volume contenu dans le tube.

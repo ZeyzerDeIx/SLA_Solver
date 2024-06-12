@@ -14,7 +14,9 @@
 class Solution
 {
 public:
-	Solution(Instance instance);
+	Solution(Instance&& instance);
+
+	friend std::ostream& operator<<(std::ostream& os, const Solution& solution);
 
 private:
 	/**

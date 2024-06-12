@@ -22,7 +22,7 @@ Cohort::Cohort(Instance& instance, Cohort& other):
 		for(Tube& tube: type.getTubes())
 		{
 			// Pareil ici on ajoute le nouveau tube qui est une copie partielle et on récupère une référence.
-			Tube& newTube = newType.addTube(Tube(newType, tube.getVolume()));
+			Tube& newTube = newType.addTube(Tube(newType, tube.getVolume(), tube.getId()));
 			// Avec cette référence on copie l'arbre de répartition du tube.
 			newTube.deepTreeCopy(tube.getTree());
 		}

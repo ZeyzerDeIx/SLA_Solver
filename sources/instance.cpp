@@ -31,12 +31,21 @@ Instance::Instance(const Instance& other): m_cities(), m_maxFreeze(other.m_maxFr
     			m_cohorts.push_back(cohortPtr2);
 }
 
+Instance::Instance(Instance&& other) noexcept :
+    m_cities(move(other.m_cities)),
+    m_cohorts(move(other.m_cohorts)),
+    m_maxFreeze(other.m_maxFreeze)
+{
+    other.m_maxFreeze = 0;
+}
+
+
 const list<unique_ptr<City>>& Instance::getCities() const {return m_cities;}
 const list<Cohort*>& Instance::getCohorts() {return m_cohorts;}
 
 int Instance::getMaxFreeze() {return m_maxFreeze;}
 
-list<Tube*> Instance::getAllTubes()
+list<Tube*> Instance::getAllTubes() const
 {
 	list<Tube*> tubes;
 	for(Cohort* cohortPtr: m_cohorts)

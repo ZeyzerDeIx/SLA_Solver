@@ -33,6 +33,13 @@ public:
 	Instance(const Instance& other);
 
 	/**
+	 * @brief Constructeur de déplacement.
+	 *
+	 * @param other L'instance à déplacer (référence à une rvalue).
+	 */
+	Instance(Instance&& other) noexcept;
+
+	/**
 	 * @brief Récupérer les villes.
 	 *
 	 * @return Une référence à un vecteur de pointeurs sur les villes.
@@ -57,7 +64,7 @@ public:
 	 *
 	 * @return Vecteur de pointeur sur les tubes.
 	 */
-	std::list<Tube*> getAllTubes();
+	std::list<Tube*> getAllTubes() const;
 
 	/**
 	 * @brief Permet d'afficher l'instance sur un flux (cout, fichier en écriture, etc.)

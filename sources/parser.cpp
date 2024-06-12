@@ -58,8 +58,8 @@ Instance Parser::parseInstance(const string& fileLocation)
 		{
 			types.emplace_back(*cohortPtr, i);
 			iss = newLine(file);
-			for(int volume ; iss >> volume;)
-				types.back().getTubes().emplace_back(types.back(), volume);
+			for(int volume,j=0 ; iss >> volume;)
+				types.back().getTubes().emplace_back(types.back(), volume, j++);
 		}
 	}
 
@@ -129,8 +129,7 @@ void parseTubeTree(Tube& tube, ifstream& file, Instance& instance)
 			}
 		);
 		
-		if(node == nullptr)
-			arcs.push(arcs.front());
+		if(node == nullptr) arcs.push(arc);
 		else
 			for(const auto& cityPtr: instance.getCities())
 				if(cityPtr->getId() == arc[1])
@@ -164,8 +163,5 @@ Solution Parser::parseSolution(const string& fileLocation, Instance instance)
 	// Fermer le fichier
 	file.close();
 
-	for(Tube* tubePtr: instance.getAllTubes())
-			cout << tubePtr->getTree() << endl;
-
-	return Solution(instance);
+	return Solution(move(instance));
 }
