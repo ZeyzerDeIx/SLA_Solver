@@ -23,6 +23,15 @@ public:
 	 */
 	unsigned int getMaxAliquo() const;
 
+	/**
+	 * @brief Détermine si la solution est meilleurs que celle donnée en paramètre.
+	 *
+	 * @param[in] other L'autre solution.
+	 *
+	 * @return Vrai si la solution est absolument meilleure que l'autre, faux sinon.
+	 */
+	bool isBetterThan(const Solution& other);
+
 	friend std::ostream& operator<<(std::ostream& os, const Solution& solution);
 
 private:

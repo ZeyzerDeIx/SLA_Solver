@@ -1,6 +1,7 @@
 #include "solution.h"
 #include <map>
 #include <algorithm>
+#include <ranges>
 
 using namespace std;
 
@@ -27,11 +28,15 @@ unsigned int Solution::getMaxAliquo() const
 				getMaxAliquoHelper(alicoCounts, tube.getTree(), cohortPtr->getSize());
 
 	unsigned int maxAliquo(0);
-	for(const auto& alicoCount: alicoCounts)
-		if(maxAliquo < alicoCount.second)
-			maxAliquo = alicoCount.second;
+	for(const auto& count: ranges::views::values(alicoCounts))
+		if(maxAliquo < count) maxAliquo = count;
 
 	return maxAliquo;
+}
+
+bool Solution::isBetterThan(const Solution& other)
+{
+	return getMaxAliquo() < other.getMaxAliquo();
 }
 
 ostream& operator<<(ostream& os, const Solution& solution)
