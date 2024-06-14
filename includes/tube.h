@@ -111,6 +111,13 @@ public:
 	const Tree<const City*>& getTree() const;
 
 	/**
+	 * @brief Permet d'afficher le tube en détails.
+	 * 
+	 * Cela inclut l'id du tube, de son type et de sa cohorte.
+	 */
+	void verbosePrint();
+
+	/**
 	 * @brief Permet d'afficher le tube sur un flux (cout, fichier en écriture, etc.)
 	 *
 	 * @param os Le flux sur lequel écrire.

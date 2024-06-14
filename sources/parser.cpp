@@ -147,6 +147,7 @@ Solution Parser::parseSolution(const string& fileLocation, Instance instance)
 		throw runtime_error("Impossible d'ouvrir le fichier : " + fileLocation);
 
 	istringstream iss;
+	newLine(file); // Ignorer la première ligne
 	int n=0;
 	for(Cohort* cohortPtr: instance.getCohorts())
 		for(Type& type: cohortPtr->getTypes())

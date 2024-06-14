@@ -14,7 +14,19 @@
 class Solution
 {
 public:
+	/**
+	 * @brief Constructeur de solution.
+	 *
+	 * @param instance Une référence à une rvalue de l'instance à déplacer.
+	 */
 	Solution(Instance&& instance);
+
+	/**
+	 * @brief Constructeur de copie.
+	 *
+	 * @param[in] other La solution à copier.
+	 */
+	Solution(const Solution& other);
 
 	/**
 	 * @brief Retourne le nombre d'aliquotages de la ville en aillant le plus.
@@ -32,6 +44,29 @@ public:
 	 */
 	bool isBetterThan(const Solution& other);
 
+	/**
+	 * @brief Échange aléatoirement deux noeuds dans un tube.
+	 * 
+	 * Dans l'arbre de répartition d'un unique tube choisit aléatoirement.
+	 */
+	void randomSwapInTube();
+
+	/**
+	 * @brief Annule le dernier swap effectué dans un tube.
+	 */
+	void revertSwapInTube();
+	/**
+	 * @brief Échange aléatoirement deux noeuds dans un type.
+	 * 
+	 * Dans les arbres de répartition des tubes d'un type choisit aléatoirement.
+	 */
+	void randomSwapInType();
+
+	/**
+	 * @brief Affiche le dernier swap éffectué.
+	 */
+	void displayLastSwap();
+
 	friend std::ostream& operator<<(std::ostream& os, const Solution& solution);
 
 private:
@@ -47,5 +82,10 @@ private:
 	 * 
 	 * Il s'agit de pointeurs car ils pointent vers les tubes de l'instance en réalité, l'idée ici c'est de se passer d'une double boucle cohortes types et d'accéder directement aux arbres.
 	 */
-	std::list<Tube*> m_tubes;
+	std::vector<Tube*> m_tubes;
+
+	/**
+	 * @brief Pointeur vers le dernier tube à avoir été swap.
+	 */
+	Tube* m_swappedTube;
 };

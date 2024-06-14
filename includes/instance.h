@@ -45,10 +45,20 @@ public:
 	 * @return Une référence à un vecteur de pointeurs sur les villes.
 	 */
 	const std::list<std::unique_ptr<City>>& getCities() const;
+
 	/**
 	 * @brief Récupérer les cohortes.
 	 *
 	 * @return Une référence à un vecteur de pointeurs sur les cohortes.
+	 */
+	std::list<Cohort*>& getCohorts();
+	/**
+	 * @brief Récupérer les cohortes (const).
+	 *
+	 * @return Une référence à un vecteur de pointeurs sur les cohortes.
+	 * 
+	 * \note
+	 * Variante constante.
 	 */
 	const std::list<Cohort*>& getCohorts() const;
 
@@ -64,7 +74,7 @@ public:
 	 *
 	 * @return Vecteur de pointeur sur les tubes.
 	 */
-	std::list<Tube*> getAllTubes() const;
+	std::vector<Tube*> getAllTubes() const;
 
 	/**
 	 * @brief Permet d'afficher l'instance sur un flux (cout, fichier en écriture, etc.)

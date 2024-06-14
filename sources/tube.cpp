@@ -47,6 +47,11 @@ void Tube::setUsedByCohort(bool usedbyCohort) {m_usedByCohort = usedbyCohort;}
 Tree<const City*>& Tube::getTree() {return m_tree;}
 const Tree<const City*>& Tube::getTree() const {return m_tree;}
 
+void Tube::verbosePrint()
+{
+	cout << "Tube n°" << m_id << " from type n°" << m_type.getId() << " from cohort n°" << m_type.getCohort().getId() << endl;
+}
+
 ostream& operator<<(ostream& os, const Tube& tube)
 {
 	return os << tube.m_volume-tube.m_usedVolume << "/" << tube.m_volume;

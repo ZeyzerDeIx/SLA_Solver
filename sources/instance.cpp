@@ -41,13 +41,14 @@ Instance::Instance(Instance&& other) noexcept :
 
 
 const list<unique_ptr<City>>& Instance::getCities() const {return m_cities;}
+list<Cohort*>& Instance::getCohorts() {return m_cohorts;}
 const list<Cohort*>& Instance::getCohorts() const {return m_cohorts;}
 
 int Instance::getMaxFreeze() {return m_maxFreeze;}
 
-list<Tube*> Instance::getAllTubes() const
+vector<Tube*> Instance::getAllTubes() const
 {
-	list<Tube*> tubes;
+	vector<Tube*> tubes;
 	for(Cohort* cohortPtr: m_cohorts)
 		for(Type& type: cohortPtr->getTypes())
 			for(Tube& tube: type.getTubes())

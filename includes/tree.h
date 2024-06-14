@@ -3,6 +3,8 @@
 #include <iostream>
 #include <vector>
 #include <functional>
+#include <random>
+#include <utility>
 
 // Concept pour vérifier si T est un pointeur
 template<typename T>
@@ -22,7 +24,7 @@ public:
 	 * 
 	 * Construit un arbre vide.
 	 */
-	Tree(): m_nodes() {}
+	Tree(): m_swappedNodes{nullptr,nullptr} {}
 
 	/**
 	 * @brief Constructeur par défaut (spé pointeur).
@@ -31,7 +33,10 @@ public:
 	 * 
 	 * @pre La valeur de m_value doit être un pointeur.
 	 */
-	Tree() requires(IsPointer<T>): m_value(nullptr) {}
+	Tree() requires(IsPointer<T>):
+		m_value(nullptr),
+		m_swappedNodes{nullptr,nullptr}
+	{}
 
 
 	/**
@@ -41,7 +46,10 @@ public:
 	 * 
 	 * @param value La valeur du noeud.
 	 */
-	Tree(T value): m_value(value) {}
+	Tree(T value):
+		m_value(value),
+		m_swappedNodes{nullptr,nullptr}
+	{}
 
 	/**
 	 * @brief Ajoute un nouveau noeud à l'arbre.
@@ -80,6 +88,19 @@ public:
 	int nodeCount() const { return m_nodes.size(); }
 
 	/**
+	 * @brief Récupère le nombre de noeuds total de l'arbre incluant les descendants.
+	 *
+	 * @return Le nombre total de noeuds.
+	 */
+	int allNodesCount() const
+	{
+		int count = nodeCount();
+		for(const Tree& node: m_nodes)
+			count += node.allNodesCount();
+		return count;
+	}
+
+	/**
 	 * @brief Récupère la valeur de l'objet.
 	 *
 	 * @return La valeur de l'objet.
@@ -104,7 +125,7 @@ public:
 	{
 		std::vector<T> values;
 		getAllValuesHelper(values);
-		return values;
+		return std::move(values);
 	}
 
 	/**
@@ -146,6 +167,69 @@ public:
 	}
 
 	/**
+	 * @brief Récupérer un noeud aléatoire de l'abre.
+	 * 
+	 * Ne peut pas retourner l'arbre lui-même, seulement des noeuds descendants.
+	 *
+	 * @return Le noeud aléatoire.
+	 */
+	Tree<T>& getRandomNode()
+	{
+		std::random_device rd;
+		std::mt19937 gen(rd());
+
+		// Création d'une distribution uniforme entre min et max inclus
+		std::uniform_int_distribution<> dis(1, allNodesCount()-1);
+
+		// Génération d'un nombre aléatoire
+		int random_num = dis(gen);
+		return getNodeAtIndex(random_num);
+	}
+
+	Tree<T>& getNodeAtIndex(int index)
+	{
+		return *getNodeAtIndexHelper(index);
+	}
+
+	/**
+	 * @brief Échange les valeures de deux noeuds.
+	 *
+	 * @param a Premier noeud.
+	 * @param b Second noeud.
+	 */
+	void swapNodes(Tree<T>& a, Tree<T>& b)
+	{
+		T temp = a.getValue();
+		a.setValue(b.getValue());
+		b.setValue(temp);
+
+		m_swappedNodes.first = &a;
+		m_swappedNodes.second = &b;
+	}
+
+	/**
+	 * @brief Annule le dernier swap.
+	 */
+	void revertSwap()
+	{
+		if(m_swappedNodes.first != nullptr)
+			swapNodes(*m_swappedNodes.first, *m_swappedNodes.second);
+		m_swappedNodes = {nullptr,nullptr};
+	}
+
+	/**
+	 * @brief Affiche le dernier swap.
+	 */
+	void displayLastSwap()
+	{
+		swapNodes(*m_swappedNodes.first, *m_swappedNodes.second);
+		print(std::cout);
+		std::cout << "Swapped " << m_swappedNodes.first->getValue() << " with " << m_swappedNodes.second->getValue() << std::endl;
+		swapNodes(*m_swappedNodes.first, *m_swappedNodes.second);
+		print(std::cout);
+	}
+
+	/**
 	 * @brief Surcharge de l'opérateur de sortie pour l'affichage de l'arbre.
 	 * 
 	 * Cette fonction surcharge l'opérateur de sortie << pour permettre l'affichage de l'arbre.
@@ -163,6 +247,8 @@ private:
 	T m_value; /**< La valeur du noeud. */
 	std::vector<Tree<T>> m_nodes; /**< Les noeuds enfants. */
 
+	std::pair<Tree*, Tree*> m_swappedNodes; /**< Les derniers noeuds à avoir été swappé.*/
+
 	/**
 	 * @brief Fonction auxiliaire récursive pour collecter les valeurs de l'arbre.
 	 * 
@@ -171,9 +257,26 @@ private:
 	void getAllValuesHelper(std::vector<T>& values) const
 	{
 		if(m_value != nullptr) values.push_back(m_value);
-		for (const Tree<T>& node : m_nodes) {
+		for (const Tree<T>& node : m_nodes)
 			node.getAllValuesHelper(values);
-		}
+	}
+
+	/**
+	 * @brief Fonction auxiliaire récursive pour atteindre le noeud ayant le bon index via un parcours en profondeur.
+	 *
+	 * @param index Une référence à l'index, décrémenté à chaque étape.
+	 *
+	 * @return Le noeud correspondant à l'index demandé si il est trouvé, nullptr sinon.
+	 */
+	Tree<T>* getNodeAtIndexHelper(int& index)
+	{
+		if(index == 0) return this;
+
+		for(Tree<T>* found; Tree& node: m_nodes)
+			if((found = node.getNodeAtIndexHelper(--index)) != nullptr)
+				return found;
+
+		return nullptr;
 	}
 
 	/**
