@@ -70,11 +70,18 @@ public:
 	int getMaxFreeze();
 
 	/**
-	 * @brief Récupérer une liste de tous les tubes contenus dans l'instane.
+	 * @brief Récupérer une liste de tous les tubes contenus dans l'instance.
 	 *
 	 * @return Vecteur de pointeur sur les tubes.
 	 */
 	std::vector<Tube*> getAllTubes() const;
+
+	/**
+	 * @brief Récupérer une liste de tous les types contenus dans l'instance.
+	 *
+	 * @return Vecteur de pointeur sur les types.
+	 */
+	std::vector<Type*> getAllTypes() const;
 
 	/**
 	 * @brief Permet d'afficher l'instance sur un flux (cout, fichier en écriture, etc.)

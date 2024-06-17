@@ -57,6 +57,16 @@ vector<Tube*> Instance::getAllTubes() const
 	return tubes;
 }
 
+vector<Type*> Instance::getAllTypes() const
+{
+	vector<Type*> types;
+	for(Cohort* cohortPtr: m_cohorts)
+		for(Type& type: cohortPtr->getTypes())
+			types.push_back(&type);
+
+	return types;
+}
+
 ostream& operator<<(ostream& os, const Instance& instance)
 {
 	os << "Instance: " << endl << endl;

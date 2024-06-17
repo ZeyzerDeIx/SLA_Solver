@@ -10,16 +10,32 @@ int main()
 	cout << endl << "DEBUT DE L'EXECUTION" << endl << endl;
 	auto start = chrono::steady_clock::now(); // Point A
 
-	Instance instance = Parser::parseInstance("instance.txt");
-	Solution solution = Parser::parseSolution("solution1.txt", instance);
+	Instance instance = Parser::parseInstance("instance2.txt");
+	Solution solution = Parser::parseSolution("solution.txt", instance);
 
 	int aliquoBase = solution.getMaxAliquo();
-	//cout << instance << endl << solution << endl;
+	cout << "Type:" << endl;
 	cout << "Max aliquo base: " << aliquoBase << endl;
-	int limit = 0 ;
+	int limit = 0 ;/*
 	for(; aliquoBase <= solution.getMaxAliquo() && limit < LIMIT; limit++)
 	{
-		solution.revertSwapInTube();
+		solution.revertSwap();
+		solution.randomSwapInType();
+	}
+	if(limit != LIMIT)
+	{
+		cout << "Max aliquo fin: " << solution.getMaxAliquo() << endl;
+		cout << "Nombre d'essais " << limit << endl;
+		solution.displayLastSwap();
+	}
+	else cout << "Echec de la mission" << endl;
+
+	cout << "Tube:" << endl;
+	aliquoBase = solution.getMaxAliquo();
+	limit = 0 ;*/
+	for(; aliquoBase <= solution.getMaxAliquo() && limit < LIMIT; limit++)
+	{
+		solution.revertSwap();
 		solution.randomSwapInTube();
 	}
 	if(limit != LIMIT)

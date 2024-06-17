@@ -1,43 +1,34 @@
 #include "solution.h"
+#include "random.h"
 #include <map>
 #include <algorithm>
 #include <ranges>
-#include <random>
-#include <climits>
 
 using namespace std;
 
-/**
- * @brief Récupérer un nombre aléatoire entre a et b.
- * 
- * \note
- * Je ne suis pas certains qu'il soit pertinent de ranger cette fonction ici, cependant elle n'est utilisée nul part ailleurs dans le code et je ne sais pas trop où la mettre sinon, à toute personne lisant ceci, sentez vous libre de la déplacer.
- *
- * @param[in] a Borne inférieure.
- * @param[in] b Borne suppérieure.
- *
- * @return Une nombre aléatoire entre a et b.
- */
-int randomNb(int a = 0, int b = INT_MAX)
-{
-    // Générateur de nombres aléatoires
-    random_device rd;
-    mt19937 gen(rd());
-    uniform_int_distribution<> dis(a, b);
-
-    // Récupérer un élément aléatoire
-	return dis(gen);
-}
+// Quelques macro pour éviter la duplication de code et rendre le tout plus lisible
+#define DISPLAY_SWAP(obj) \
+	if (obj != nullptr) \
+	{ \
+		obj->verbosePrint(); \
+		obj->displayLastSwap(); \
+	}
+#define REVERT_SWAP(obj) \
+	if (obj != nullptr) \
+		obj->revertSwap(); \
+	obj = nullptr;
 
 Solution::Solution(Instance&& instance):
 	m_instance(move(instance)),
 	m_tubes(m_instance.getAllTubes()),
+	m_types(m_instance.getAllTypes()),
 	m_swappedTube(nullptr)
 {}
 
 Solution::Solution(const Solution& other):
 	m_instance(other.m_instance),
 	m_tubes(m_instance.getAllTubes()),
+	m_types(m_instance.getAllTypes()),
 	m_swappedTube(nullptr)
 {}
 
@@ -72,27 +63,29 @@ bool Solution::isBetterThan(const Solution& other)
 
 void Solution::randomSwapInTube()
 {
-	Tube* tube = m_tubes[randomNb(0,m_tubes.size()-1)];
-	Tree<const City*>& tree = tube->getTree();
+	Tube* tube = m_tubes[Random::randomNb(0,m_tubes.size()-1)];
 
-	tree.swapNodes(tree.getRandomNode(), tree.getRandomNode());
+	tube->swapRandomNodes();
 	m_swappedTube = tube;
 }
 
-void Solution::revertSwapInTube()
+void Solution::randomSwapInType()
 {
-	if(m_swappedTube != nullptr)
-		m_swappedTube->getTree().revertSwap();
-	m_swappedTube = nullptr;
+	Type* type = m_types[Random::randomNb(0,m_types.size()-1)];
+	type->swapRandomNodes();
+	m_swappedType = type;
 }
 
-void Solution::randomSwapInType()
-{}
+void Solution::revertSwap()
+{
+	REVERT_SWAP(m_swappedTube);
+	REVERT_SWAP(m_swappedType);
+}
 
 void Solution::displayLastSwap()
 {
-	m_swappedTube->verbosePrint();
-	m_swappedTube->getTree().displayLastSwap();
+	DISPLAY_SWAP(m_swappedTube);
+	DISPLAY_SWAP(m_swappedType);
 }
 
 ostream& operator<<(ostream& os, const Solution& solution)

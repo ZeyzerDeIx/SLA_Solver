@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <utility>
 #include "tree.h"
 #include "city.h"
 
@@ -111,6 +112,31 @@ public:
 	const Tree<const City*>& getTree() const;
 
 	/**
+	 * @brief Échange les valeures de deux noeuds de l'arbre.
+	 *
+	 * @param a Premier noeud.
+	 * @param b Second noeud.
+	 */
+	void swapNodes(Tree<const City*>& a, Tree<const City*>& b);
+
+	/**
+	 * @brief Swap aléatoirement deux noeuds de l'arbre.
+	 */
+	void swapRandomNodes();
+
+	/**
+	 * @brief Annule le dernier swap.
+	 */
+	void revertSwap();
+
+	/**
+	 * @brief Affiche le dernier swap.
+	 */
+	void displayLastSwap();
+
+	void moveNode(Tree<const City*>& toMove, Tree<const City*>& destination);
+
+	/**
 	 * @brief Permet d'afficher le tube en détails.
 	 * 
 	 * Cela inclut l'id du tube, de son type et de sa cohorte.
@@ -162,4 +188,9 @@ private:
 	 * De cet arbre peuvent être déduis les arcs à enregistrer dans la solution.
 	 */
 	Tree<const City*> m_tree;
+
+	/**
+	 * @brief Les derniers noeuds à avoir été swappé.
+	 */
+	std::pair<Tree<const City*>*, Tree<const City*>*> m_swappedNodes; 
 };

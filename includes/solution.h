@@ -50,17 +50,17 @@ public:
 	 * Dans l'arbre de répartition d'un unique tube choisit aléatoirement.
 	 */
 	void randomSwapInTube();
-
-	/**
-	 * @brief Annule le dernier swap effectué dans un tube.
-	 */
-	void revertSwapInTube();
 	/**
 	 * @brief Échange aléatoirement deux noeuds dans un type.
 	 * 
 	 * Dans les arbres de répartition des tubes d'un type choisit aléatoirement.
 	 */
 	void randomSwapInType();
+
+	/**
+	 * @brief Annule le dernier swap effectué.
+	 */
+	void revertSwap();
 
 	/**
 	 * @brief Affiche le dernier swap éffectué.
@@ -85,7 +85,19 @@ private:
 	std::vector<Tube*> m_tubes;
 
 	/**
+	 * @brief Liste des types de la solution.
+	 * 
+	 * Il s'agit de pointeurs car ils pointent vers les types de l'instance en réalité, l'idée ici c'est de se passer d'une boucle cohortes et d'accéder directement aux types.
+	 */
+	std::vector<Type*> m_types;
+
+	/**
 	 * @brief Pointeur vers le dernier tube à avoir été swap.
 	 */
 	Tube* m_swappedTube;
+
+	/**
+	 * @brief Pointeur vers le dernier type à avoir été swap.
+	 */
+	Type* m_swappedType;
 };

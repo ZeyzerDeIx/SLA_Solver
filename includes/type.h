@@ -43,6 +43,36 @@ public:
 	Tube& addTube(Tube tube);
 
 	/**
+	 * @brief Échange les valeures de deux noeuds dans les tubes.
+	 *
+	 * @param a Premier noeud.
+	 * @param b Second noeud.
+	 */
+	void swapNodes(Tree<const City*>& a, Tree<const City*>& b);
+
+	/**
+	 * @brief Swap deux noeuds aléatoire entre deux tubes aléatoires.
+	 */
+	void swapRandomNodes();
+
+	/**
+	 * @brief Annule le dernier swap.
+	 */
+	void revertSwap();
+
+	/**
+	 * @brief Permet d'afficher le type en détails.
+	 * 
+	 * Cela inclut l'id du type et de sa cohorte.
+	 */
+	void verbosePrint();
+
+	/**
+	 * @brief Affiche le dernier swap.
+	 */
+	void displayLastSwap();
+
+	/**
 	 * @brief Permet d'afficher du type sur un flux (cout, fichier en écriture, etc.)
 	 *
 	 * @param os Le flux sur lequel écrire.
@@ -79,4 +109,9 @@ private:
 	 * @brief Liste des tubes rattachés au type.
 	 */
 	std::list<Tube> m_tubes;
+
+	/**
+	 * @brief Les derniers noeuds à avoir été swappé.
+	 */
+	std::pair<Tree<const City*>*, Tree<const City*>*> m_swappedNodes;
 };

@@ -3,8 +3,7 @@
 #include <iostream>
 #include <vector>
 #include <functional>
-#include <random>
-#include <utility>
+#include "random.h"
 
 // Concept pour vérifier si T est un pointeur
 template<typename T>
@@ -24,7 +23,7 @@ public:
 	 * 
 	 * Construit un arbre vide.
 	 */
-	Tree(): m_swappedNodes{nullptr,nullptr} {}
+	Tree(): m_root(nullptr) {}
 
 	/**
 	 * @brief Constructeur par défaut (spé pointeur).
@@ -35,7 +34,7 @@ public:
 	 */
 	Tree() requires(IsPointer<T>):
 		m_value(nullptr),
-		m_swappedNodes{nullptr,nullptr}
+		m_root(nullptr)
 	{}
 
 
@@ -46,9 +45,9 @@ public:
 	 * 
 	 * @param value La valeur du noeud.
 	 */
-	Tree(T value):
+	Tree(T value, Tree<T>* root = nullptr):
 		m_value(value),
-		m_swappedNodes{nullptr,nullptr}
+		m_root(root)
 	{}
 
 	/**
@@ -59,7 +58,7 @@ public:
 	 * @param value La valeur du nouveau noeud à ajouter.
 	 * @return Une référence à l'élément inséré.
 	 */
-	Tree<T>& addNode(const T& value) { return m_nodes.emplace_back(value); }
+	Tree<T>& addNode(const T& value) { return m_nodes.emplace_back(value, this); }
 
 	/**
 	 * @brief Récupère un noeud de l'arbre par son index.
@@ -175,58 +174,12 @@ public:
 	 */
 	Tree<T>& getRandomNode()
 	{
-		std::random_device rd;
-		std::mt19937 gen(rd());
-
-		// Création d'une distribution uniforme entre min et max inclus
-		std::uniform_int_distribution<> dis(1, allNodesCount()-1);
-
-		// Génération d'un nombre aléatoire
-		int random_num = dis(gen);
-		return getNodeAtIndex(random_num);
+		return getNodeAtIndex(Random::randomNb(1, allNodesCount()-1));
 	}
 
 	Tree<T>& getNodeAtIndex(int index)
 	{
 		return *getNodeAtIndexHelper(index);
-	}
-
-	/**
-	 * @brief Échange les valeures de deux noeuds.
-	 *
-	 * @param a Premier noeud.
-	 * @param b Second noeud.
-	 */
-	void swapNodes(Tree<T>& a, Tree<T>& b)
-	{
-		T temp = a.getValue();
-		a.setValue(b.getValue());
-		b.setValue(temp);
-
-		m_swappedNodes.first = &a;
-		m_swappedNodes.second = &b;
-	}
-
-	/**
-	 * @brief Annule le dernier swap.
-	 */
-	void revertSwap()
-	{
-		if(m_swappedNodes.first != nullptr)
-			swapNodes(*m_swappedNodes.first, *m_swappedNodes.second);
-		m_swappedNodes = {nullptr,nullptr};
-	}
-
-	/**
-	 * @brief Affiche le dernier swap.
-	 */
-	void displayLastSwap()
-	{
-		swapNodes(*m_swappedNodes.first, *m_swappedNodes.second);
-		print(std::cout);
-		std::cout << "Swapped " << m_swappedNodes.first->getValue() << " with " << m_swappedNodes.second->getValue() << std::endl;
-		swapNodes(*m_swappedNodes.first, *m_swappedNodes.second);
-		print(std::cout);
 	}
 
 	/**
@@ -246,8 +199,7 @@ public:
 private:
 	T m_value; /**< La valeur du noeud. */
 	std::vector<Tree<T>> m_nodes; /**< Les noeuds enfants. */
-
-	std::pair<Tree*, Tree*> m_swappedNodes; /**< Les derniers noeuds à avoir été swappé.*/
+	Tree<T>* m_root; /**< La racine (le noeud parent). */
 
 	/**
 	 * @brief Fonction auxiliaire récursive pour collecter les valeurs de l'arbre.
@@ -278,6 +230,8 @@ private:
 
 		return nullptr;
 	}
+
+	Tree<T>* getRoot() {return m_root;}
 
 	/**
 	 * @brief Affiche l'arbre avec un décalage d'indentation sur un flux de sortie.
