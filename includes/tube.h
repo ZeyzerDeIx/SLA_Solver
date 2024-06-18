@@ -134,8 +134,6 @@ public:
 	 */
 	void displayLastSwap();
 
-	void moveNode(Tree<const City*>& toMove, Tree<const City*>& destination);
-
 	/**
 	 * @brief Permet d'afficher le tube en détails.
 	 * 
@@ -192,5 +190,5 @@ private:
 	/**
 	 * @brief Les derniers noeuds à avoir été swappé.
 	 */
-	std::pair<Tree<const City*>*, Tree<const City*>*> m_swappedNodes; 
+	std::pair<Tree<const City*>*, Tree<const City*>*> m_swappedNodes;
 };

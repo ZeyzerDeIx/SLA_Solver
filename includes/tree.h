@@ -1,7 +1,7 @@
 #pragma once
 
 #include <iostream>
-#include <vector>
+#include <list>
 #include <functional>
 #include "random.h"
 
@@ -61,6 +61,57 @@ public:
 	Tree<T>& addNode(const T& value) { return m_nodes.emplace_back(value, this); }
 
 	/**
+	 * @brief Déplace un noeud depuis un autre arbre.
+	 * 
+	 * Cette méthode ajoute un nouveau noeud à l'arbre en tant qu'enfant du noeud courant et le retire de son ancien parent.
+	 * 
+	 * @param node Le noeud à déplacer.
+	 * @return Une référence à l'élément inséré.
+	 */
+	Tree<T>& moveNode(Tree<T>& node)
+	{
+		auto nodeIt = find_if(
+			node.getRoot()->getNodes().begin(),
+			node.getRoot()->getNodes().end(),
+			[&node](auto& tree){return &tree == &node;}
+		);
+		return moveNode(nodeIt);
+	}
+	/**
+	 * @brief Déplace un noeud depuis un autre arbre.
+	 * 
+	 * Cette méthode ajoute un nouveau noeud à l'arbre en tant qu'enfant du noeud courant et le retire de son ancien parent.
+	 * 
+	 * @param nodeIt Un iterateur sur le noeud à déplacer.
+	 * @return Une référence à l'élément inséré.
+	 */
+	Tree<T>& moveNode(std::list<Tree<T>>::iterator nodeIt)
+	{
+		nodeIt->setRoot(this);
+		m_nodes.splice(m_nodes.end(), nodeIt->getRoot()->getNodes(), nodeIt);
+
+		return m_nodes.back();
+	}
+
+	/**
+	 * @brief Déplace tous les noeuds d'un autre arbre.
+	 * 
+	 * Cette méthode ajoute des nouveaux noeud à l'arbre en tant qu'enfants du noeud courant et les retire à leur ancien parent.
+	 * 
+	 * @param target Le noeud dont sont extraits les enfants.
+	 */
+	void moveNodes(Tree<T>& target)
+	{
+		// On récupère les successeurs de l'élément que l'on a remonté.
+		std::list<Tree<T>>& nodeList = target.getNodes();
+		// On met à jour leur racines.
+		for (auto it = nodeList.begin(); it != nodeList.end(); ++it)
+			it->setRoot(this);
+		// On déplace.
+		m_nodes.splice(m_nodes.end(), nodeList);
+	}
+
+	/**
 	 * @brief Récupère un noeud de l'arbre par son index.
 	 * 
 	 * Cette méthode permet de récupérer un noeud de l'arbre en fonction de son index dans le vecteur
@@ -76,7 +127,17 @@ public:
 	 *
 	 * @return Une référence au vecteur des nœuds de l'arbre. Chaque nœud est de type Tree<T>.
 	 */
-	const std::vector<Tree<T>>& getNodes() const {return m_nodes;}
+	std::list<Tree<T>>& getNodes() {return m_nodes;}
+
+	/**
+	 * @brief Récupère la liste (const) des nœuds de l'arbre.
+	 *
+	 * @return Une référence au vecteur des nœuds de l'arbre. Chaque nœud est de type Tree<T>.
+	 * 
+	 * \note
+	 * Variante constante.
+	 */
+	const std::list<Tree<T>>& getNodes() const {return m_nodes;}
 
 
 	/**
@@ -120,9 +181,9 @@ public:
 	 * 
 	 * @return Un vecteur contenant toutes les valeurs de l'arbre.
 	 */
-	std::vector<T> getAllValues() const
+	std::list<T> getAllValues() const
 	{
-		std::vector<T> values;
+		std::list<T> values;
 		getAllValuesHelper(values);
 		return std::move(values);
 	}
@@ -183,6 +244,20 @@ public:
 	}
 
 	/**
+	 * @brief Récupère la racine (le parent) du noeud.
+	 *
+	 * @return Un pointeur vers la racine.
+	 */
+	Tree<T>* getRoot() {return m_root;}
+
+	/**
+	 * @brief Mettre à jour la valeure de la racine (parent) du noeud.
+	 *
+	 * @param root Un pointeur vers la nouvelle racine.
+	 */
+	void setRoot(Tree<T>* root) {m_root = root;}
+
+	/**
 	 * @brief Surcharge de l'opérateur de sortie pour l'affichage de l'arbre.
 	 * 
 	 * Cette fonction surcharge l'opérateur de sortie << pour permettre l'affichage de l'arbre.
@@ -198,7 +273,7 @@ public:
 
 private:
 	T m_value; /**< La valeur du noeud. */
-	std::vector<Tree<T>> m_nodes; /**< Les noeuds enfants. */
+	std::list<Tree<T>> m_nodes; /**< Les noeuds enfants. */
 	Tree<T>* m_root; /**< La racine (le noeud parent). */
 
 	/**
@@ -206,7 +281,7 @@ private:
 	 * 
 	 * @param values Référence au vecteur où les valeurs seront collectées.
 	 */
-	void getAllValuesHelper(std::vector<T>& values) const
+	void getAllValuesHelper(std::list<T>& values) const
 	{
 		if(m_value != nullptr) values.push_back(m_value);
 		for (const Tree<T>& node : m_nodes)
@@ -230,8 +305,6 @@ private:
 
 		return nullptr;
 	}
-
-	Tree<T>* getRoot() {return m_root;}
 
 	/**
 	 * @brief Affiche l'arbre avec un décalage d'indentation sur un flux de sortie.

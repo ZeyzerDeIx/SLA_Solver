@@ -75,14 +75,9 @@ void Tube::displayLastSwap()
 {
 	swapNodes(*m_swappedNodes.first, *m_swappedNodes.second);
 	cout << m_tree << endl;
-	std::cout << "Swapped " << m_swappedNodes.first->getValue() << " with " << m_swappedNodes.second->getValue() << std::endl;
+	cout << "Swapped " << m_swappedNodes.first->getValue() << " with " << m_swappedNodes.second->getValue() << endl;
 	swapNodes(*m_swappedNodes.first, *m_swappedNodes.second);
 	cout << m_tree << endl;
-}
-
-void Tube::moveNode(Tree<const City*>& toMove, Tree<const City*>& destination)
-{
-	
 }
 
 void Tube::verbosePrint()
