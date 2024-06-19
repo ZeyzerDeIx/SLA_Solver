@@ -1,5 +1,6 @@
 #include "type.h"
 #include "cohort.h"
+#include "instance.h"
 #include "random.h"
 
 using namespace std;
@@ -59,6 +60,8 @@ void Type::revertSwap()
 
 void Type::moveNode(CityTree* toMove, CityTree* a, CityTree* b)
 {
+	if(toMove == a or toMove == b or a == b) return;
+
 	CityTree* root = toMove->getRoot();
 	list<CityTree>& rootList = root->getNodes();
 	list<CityTree>& aList = a->getNodes();
@@ -87,6 +90,67 @@ void Type::moveNode(CityTree* toMove, CityTree* a, CityTree* b)
 	m_moveHistory.push(archive);
 }
 
+void Type::moveRandomNode()
+{
+	CityTree* dest(nullptr);
+	CityTree* toMove(nullptr);
+	CityTree* b(nullptr);
+	for(bool loop = true; loop;)
+	{
+		// On tire un noeud aléatoire.
+		dest = &getRandomNode();
+		// Si l'unes des conditions suivante est vrai, alors on recommance la boucle.
+		loop =
+			// Si le noeud est null.
+			dest == nullptr or
+			// Si la destination est déjà à la profondeure max.
+			dest->getDepth() == m_cohort.getInstance().getMaxFreeze();
+	}
+	
+	for(bool loop = true; loop;)
+	{
+		// On tire un noeud aléatoire.
+		toMove = &getRandomNode();
+
+		if(toMove == nullptr) continue;
+
+		list<CityTree>& nodes = toMove->getNodes();
+
+		// On cherche parmis les successeurs directs de toMove si dest est présent.
+		auto found = find_if(nodes.begin(), nodes.end(),
+			[&dest](const CityTree& tree){return dest == &tree;}
+		);
+		// Si l'unes des conditions suivante est vrai, alors on recommance la boucle.
+		loop = found != nodes.end();
+	}
+	
+	for(CityTree& node: dest->getNodes())
+	{
+		// On tire un noeud aléatoire.
+		b = &node;
+
+		
+		if(b->getMaxDepth() != m_cohort.getInstance().getMaxFreeze())
+			break;
+	}
+	
+	//TODO: vérifier que le déplacement est légal.
+
+
+	CityTree* root(nullptr);
+	for(root = toMove->getRoot(); root->getRoot() != nullptr; root = root->getRoot());
+	if(root != nullptr) cout << "toMoveRoot:\n" << *root << endl;
+	cout << "toMove: " << toMove << endl << *toMove << endl;
+	cout << "dest:\n" << *dest << endl;
+
+	moveNode(toMove, dest, b);
+
+
+	if(root != nullptr) cout << "toMoveRoot:\n" << *root << endl;
+	cout << "toMove: " << toMove << endl << *toMove << endl;
+	cout << "dest:\n" << *dest << endl;
+}
+
 void Type::revertMove()
 {
 	if(m_moveHistory.size() == 0) return;
@@ -98,13 +162,13 @@ void Type::revertMove()
 		archive.moved->getRoot()->moveNode(*archive.replaced);
 
 	// On replace l'élément déplacé.
-	archive.formerRoot->moveNode(archive.moved);
+	archive.formerRoot->moveNode(*archive.moved);
 
 	// Si il en avait, on lui redonne ses successeurs.
 	if(archive.replacement != nullptr)
 	{
-		archive.moved->moveNodes(&archive.replacement);
-		archive.moved->moveNode(&archive.replacement);
+		archive.moved->moveNodes(*archive.replacement);
+		archive.moved->moveNode(*archive.replacement);
 	}
 
 	m_moveHistory.pop();

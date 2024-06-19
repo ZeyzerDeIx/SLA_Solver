@@ -76,8 +76,16 @@ public:
 	 * @param toMove Le noeud à déplacer.
 	 * @param a L'arbre qui sera la nouvelle racine du noeud déplacé.
 	 * @param b L'arbre qui deviendra successeur du noeud déplacé. Par défaut sa valeure est nullptr, cela signifie que toMove est juste inséré dans les successeurs de a.
+	 * 
+	 * \note
+	 * Cette méthode ne vérifie pas la légalité du mouvement demandé. À utiliser avec précautions.
 	 */
 	void moveNode(Tree<const City*>* toMove, Tree<const City*>* a, Tree<const City*>* b = nullptr);
+
+	/**
+	 * @brief Déplace un noeud choisit aléatoirement vers un autre également aléatoire.
+	 */
+	void moveRandomNode();
 
 	/**
 	 * @brief Annule le dernier déplacement de noeud effectué dans le type.

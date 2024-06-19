@@ -22,14 +22,16 @@ Solution::Solution(Instance&& instance):
 	m_instance(move(instance)),
 	m_tubes(m_instance.getAllTubes()),
 	m_types(m_instance.getAllTypes()),
-	m_swappedTube(nullptr)
+	m_swappedTube(nullptr),
+	m_swappedType(nullptr)
 {}
 
 Solution::Solution(const Solution& other):
 	m_instance(other.m_instance),
 	m_tubes(m_instance.getAllTubes()),
 	m_types(m_instance.getAllTypes()),
-	m_swappedTube(nullptr)
+	m_swappedTube(nullptr),
+	m_swappedType(nullptr)
 {}
 
 void getMaxAliquoHelper(map<const City*, unsigned int>& alicoCounts, const Tree<const City*>& tree, int cohortSize)
@@ -86,6 +88,21 @@ void Solution::displayLastSwap()
 {
 	DISPLAY_SWAP(m_swappedTube);
 	DISPLAY_SWAP(m_swappedType);
+}
+
+void Solution::randomMoveInType()
+{
+	Type* type = m_types[Random::randomNb(0,m_types.size()-1)];
+	type->moveRandomNode();
+	m_movedTypeHistory.push(type);
+}
+
+void Solution::revertMove()
+{
+	if(m_movedTypeHistory.size() == 0) return;
+
+	m_movedTypeHistory.top()->revertMove();
+	m_movedTypeHistory.pop();
 }
 
 ostream& operator<<(ostream& os, const Solution& solution)

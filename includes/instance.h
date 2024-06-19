@@ -67,7 +67,7 @@ public:
 	 *
 	 * @return Le nombre max de congélation.
 	 */
-	int getMaxFreeze();
+	int getMaxFreeze() const;
 
 	/**
 	 * @brief Récupérer une liste de tous les tubes contenus dans l'instance.

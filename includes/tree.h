@@ -258,6 +258,32 @@ public:
 	void setRoot(Tree<T>* root) {m_root = root;}
 
 	/**
+	 * @brief Récupère la profondeur du noeud.
+	 *
+	 * Cette méthode calcule la profondeur du noeud dans l'arbre en partant de la racine.
+	 *
+	 * @return La profondeur du noeud courrant. Si le noeud est racine, retourne 1.
+	 */
+	int getDepth() const
+	{
+		return m_root != nullptr ? m_root->getDepth()+1 : 1;
+	}
+
+	int getMaxDepth() const
+	{
+		int maxDepth = getDepth();
+
+		if(nodeCount() == 0) return maxDepth;
+
+		for(const Tree<T>& node : m_nodes)
+			if(int nodeMaxDepth = node.getMaxDepth() > maxDepth)
+				maxDepth = nodeMaxDepth;
+
+		return maxDepth;
+	}
+
+
+	/**
 	 * @brief Surcharge de l'opérateur de sortie pour l'affichage de l'arbre.
 	 * 
 	 * Cette fonction surcharge l'opérateur de sortie << pour permettre l'affichage de l'arbre.
@@ -284,7 +310,7 @@ private:
 	void getAllValuesHelper(std::list<T>& values) const
 	{
 		if(m_value != nullptr) values.push_back(m_value);
-		for (const Tree<T>& node : m_nodes)
+		for(const Tree<T>& node : m_nodes)
 			node.getAllValuesHelper(values);
 	}
 
@@ -305,7 +331,6 @@ private:
 
 		return nullptr;
 	}
-
 	/**
 	 * @brief Affiche l'arbre avec un décalage d'indentation sur un flux de sortie.
 	 * 

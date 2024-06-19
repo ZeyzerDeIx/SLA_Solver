@@ -67,6 +67,16 @@ public:
 	 */
 	void displayLastSwap();
 
+	/**
+	 * @brief Déplace aléatoirement un noeud dans un type également aléatoire.
+	 */
+	void randomMoveInType();
+
+	/**
+	 * @brief Annule le dernier déplacement.
+	 */
+	void revertMove();
+
 	friend std::ostream& operator<<(std::ostream& os, const Solution& solution);
 
 private:
@@ -100,4 +110,6 @@ private:
 	 * @brief Pointeur vers le dernier type à avoir été swap.
 	 */
 	Type* m_swappedType;
+
+	std::stack<Type*> m_movedTypeHistory;
 };
