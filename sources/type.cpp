@@ -9,8 +9,7 @@ using CityTree = Tree<const City*>;
 
 Type::Type(const Cohort& cohort, int id):
 	m_cohort(cohort),
-	m_id(id),
-	m_swappedNodes{nullptr,nullptr}
+	m_id(id)
 {}
 Type::~Type()
 {}
@@ -35,15 +34,14 @@ CityTree& Type::getRandomNode()
 	return it->getTree().getRandomNode();
 }
 
-void Type::swapNodes(CityTree& a, CityTree& b)
+void Type::swapNodes(CityTree& a, CityTree& b, bool saveSwap)
 {
 	if(&a == nullptr or &b == nullptr) return;
 	const City* temp = a.getValue();
 	a.setValue(b.getValue());
 	b.setValue(temp);
 
-	m_swappedNodes.first = &a;
-	m_swappedNodes.second = &b;
+	if(saveSwap) m_swapHistory.push({&a,&b});
 }
 
 void Type::swapRandomNodes()
@@ -53,9 +51,10 @@ void Type::swapRandomNodes()
 
 void Type::revertSwap()
 {
-	if(m_swappedNodes.first != nullptr)
-		swapNodes(*m_swappedNodes.first, *m_swappedNodes.second);
-	m_swappedNodes = {nullptr,nullptr};
+	if(m_swapHistory.size() == 0) return;
+
+	swapNodes(*m_swapHistory.top().first, *m_swapHistory.top().second, false);
+	m_swapHistory.pop();
 }
 
 void Type::moveNode(CityTree* toMove, CityTree* a, CityTree* b)
@@ -66,7 +65,20 @@ void Type::moveNode(CityTree* toMove, CityTree* a, CityTree* b)
 	list<CityTree>& rootList = root->getNodes();
 	list<CityTree>& aList = a->getNodes();
 
-	ArchivedMove archive = {nullptr,nullptr,root,nullptr};
+	// tmTRoot pour toMoveTrueRoot, la racine là plus lointaine de toMove
+	CityTree* tmTRoot = root;
+	while (tmTRoot->getRoot() != nullptr)
+		tmTRoot = tmTRoot->getRoot();
+
+	// aTRoot pour aTrueRoot
+	CityTree* aTRoot = a;
+	while (aTRoot->getRoot() != nullptr)
+		aTRoot = aTRoot->getRoot();
+
+	cout << "tmTRoot:\n" << *tmTRoot << endl;
+	cout << "aTRoot:\n" << *aTRoot << endl;
+
+	ArchivedMove archive = {tmTRoot,CityTree(*tmTRoot), aTRoot, CityTree(*aTRoot)};
 
 	// Si le noeud à déplacer possèdes des successeurs.
 	if(toMove->nodeCount() != 0)
@@ -75,16 +87,14 @@ void Type::moveNode(CityTree* toMove, CityTree* a, CityTree* b)
 		CityTree& moved = root->moveNode(toMove->getNodes().begin());
 		// Les successeurs du noeud à déplacer sont déplacés vers le noeud que l'on vient de remonter.
 		moved.moveNodes(*toMove);
-		// On enregistre moved comme ayant remplacé toMove dans la pile.
-		archive.replacement = &moved;
 	}
 	
-	// On déplace effectivement le noeud et on stock sa nouvelle valeur dans la pile d'archive des déplacement.
-	archive.moved = &a->moveNode(*toMove);
+	// On déplace effectivement le noeud.
+	&a->moveNode(*toMove);
 
-	// Si b existe, on le rattache toMove et on l'enregistre.
+	// Si b existe, on le rattache toMove.
 	if(b != nullptr)
-		archive.replaced = &toMove->moveNode(*b);
+		&toMove->moveNode(*b);
 
 	// On enregistre le déplacement.
 	m_moveHistory.push(archive);
@@ -112,6 +122,7 @@ void Type::moveRandomNode()
 		// On tire un noeud aléatoire.
 		toMove = &getRandomNode();
 
+		// Si le pointeur est null, on reboucle de suite.
 		if(toMove == nullptr) continue;
 
 		list<CityTree>& nodes = toMove->getNodes();
@@ -120,7 +131,7 @@ void Type::moveRandomNode()
 		auto found = find_if(nodes.begin(), nodes.end(),
 			[&dest](const CityTree& tree){return dest == &tree;}
 		);
-		// Si l'unes des conditions suivante est vrai, alors on recommance la boucle.
+		// Si dest est successeur, alors on reboucle car cela reviendrait à faire un simple swap (en plus de provoquer des problèmes)
 		loop = found != nodes.end();
 	}
 	
@@ -129,26 +140,11 @@ void Type::moveRandomNode()
 		// On tire un noeud aléatoire.
 		b = &node;
 
-		
 		if(b->getMaxDepth() != m_cohort.getInstance().getMaxFreeze())
 			break;
 	}
-	
-	//TODO: vérifier que le déplacement est légal.
-
-
-	CityTree* root(nullptr);
-	for(root = toMove->getRoot(); root->getRoot() != nullptr; root = root->getRoot());
-	if(root != nullptr) cout << "toMoveRoot:\n" << *root << endl;
-	cout << "toMove: " << toMove << endl << *toMove << endl;
-	cout << "dest:\n" << *dest << endl;
 
 	moveNode(toMove, dest, b);
-
-
-	if(root != nullptr) cout << "toMoveRoot:\n" << *root << endl;
-	cout << "toMove: " << toMove << endl << *toMove << endl;
-	cout << "dest:\n" << *dest << endl;
 }
 
 void Type::revertMove()
@@ -157,19 +153,12 @@ void Type::revertMove()
 
 	ArchivedMove& archive = m_moveHistory.top();
 
-	// Si il y a eu un noeud remplacé par (et donc successeur de) moved, on le remet à sa place.
-	if(archive.replaced != nullptr)
-		archive.moved->getRoot()->moveNode(*archive.replaced);
-
-	// On replace l'élément déplacé.
-	archive.formerRoot->moveNode(*archive.moved);
-
-	// Si il en avait, on lui redonne ses successeurs.
-	if(archive.replacement != nullptr)
-	{
-		archive.moved->moveNodes(*archive.replacement);
-		archive.moved->moveNode(*archive.replacement);
-	}
+	cout << "archive.destTRoot\n" << *archive.destTRoot << endl;
+	cout << "archive.formerTRoot\n" << *archive.formerTRoot << endl;
+	*archive.destTRoot = move(archive.destTRootSave);
+	*archive.formerTRoot = move(archive.formerTRootSave);
+	cout << "archive.destTRoot\n" << *archive.destTRoot << endl;
+	cout << "archive.formerTRoot\n" << *archive.formerTRoot << endl;
 
 	m_moveHistory.pop();
 }
@@ -181,7 +170,7 @@ void Type::verbosePrint()
 
 void Type::displayLastSwap()
 {
-	cout << "Swapped " << m_swappedNodes.first->getValue() << " with " << m_swappedNodes.second->getValue() << endl;
+	cout << "Swapped " << m_swapHistory.top().first->getValue() << " with " << m_swapHistory.top().second->getValue() << endl;
 }
 
 ostream& operator<<(ostream& os, const Type& type)

@@ -51,6 +51,55 @@ public:
 	{}
 
 	/**
+	 * @brief Constructeur de copie.
+	 *
+	 * @param[in] other l'arbre à copier.
+	 */
+	Tree(const Tree<T>& other):
+		m_value(other.m_value),
+		m_root(other.m_root)
+	{
+		for(const Tree<T>& node : other.m_nodes)
+			m_nodes.emplace_back(node.getValue(), this);
+	}
+
+	/**
+	 * @brief Constructeur de déplacement.
+	 *
+	 * @param other L'arbre à utiliser.
+	 * 
+	 * \note
+	 * L'objet déplacé n'est plus utilisable après cela.
+	 */
+	Tree(Tree<T>&& other):
+		m_value(std::move(other.m_value)),
+		m_root(std::move(m_root)),
+		m_nodes(std::move(other.m_nodes))
+	{}
+
+	/**
+	 * @brief Opérateur d'affectation par déplacement.
+	 *
+	 * @param other L'élément à utiliser (déplacer).
+	 *
+	 * @return Une référence au résultat du déplacement.
+	 * 
+	 * \note
+	 * L'objet déplacé n'est plus utilisable après cela.
+	 */
+	Tree& operator=(Tree&& other) noexcept
+	{
+        if (this != &other)
+        {
+            // Transférer les ressources de other vers this
+            m_value = std::move(other.m_value);
+            m_root = std::move(other.m_root);
+            m_nodes = std::move(other.m_nodes);
+        }
+        return *this;
+    }
+
+	/**
 	 * @brief Ajoute un nouveau noeud à l'arbre.
 	 * 
 	 * Cette méthode ajoute un nouveau noeud à l'arbre en tant qu'enfant du noeud courant.
@@ -269,6 +318,11 @@ public:
 		return m_root != nullptr ? m_root->getDepth()+1 : 1;
 	}
 
+	/**
+	 * @brief Récupère la profondeur du noeud le plus profond du noeud courrant.
+	 *
+	 * @return La profondeur max.
+	 */
 	int getMaxDepth() const
 	{
 		int maxDepth = getDepth();

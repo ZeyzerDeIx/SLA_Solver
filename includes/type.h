@@ -55,8 +55,9 @@ public:
 	 *
 	 * @param a Premier noeud.
 	 * @param b Second noeud.
+	 * @param[in] saveSwap Si le swap doit être sauvegardé dans l'historique des swap. Typiquement faux en cas de revert.
 	 */
-	void swapNodes(Tree<const City*>& a, Tree<const City*>& b);
+	void swapNodes(Tree<const City*>& a, Tree<const City*>& b, bool saveSwap = true);
 
 	/**
 	 * @brief Swap deux noeuds aléatoire entre deux tubes aléatoires.
@@ -134,21 +135,15 @@ private:
 	struct ArchivedMove
 	{
 		/**
-		 * @brief L'éventuel ancien successeur qui a remplacé le noeud déplacé. nullptr si il n'avait aucun successeur.
+		 * @brief destTRoot pour destinationTrueRoot, la racine la plus lointaine de la destination avant déplacement.
 		 */
-		Tree<const City*>* replacement;
+		Tree<const City*>* destTRoot;
+		Tree<const City*> destTRootSave;
 		/**
-		 * @brief Le noeud que l'on a déplacé.
+		 * @brief formerTRoot pour formerTrueRoot, la racine la plus lointaine du noeud avant déplacement.
 		 */
-		Tree<const City*>* moved;
-		/**
-		 * @brief L'ancienne racine du noeud déplacé.
-		 */
-		Tree<const City*>* formerRoot;
-		/**
-		 * @brief Le noeud qui a éventuellement été déplacé à l'insertion de moved, dans la méthode moveNode, cela correspond au paramètre b.
-		 */
-		Tree<const City*>* replaced;
+		Tree<const City*>* formerTRoot;
+		Tree<const City*> formerTRootSave;
 	};
 
 	/**
@@ -169,9 +164,9 @@ private:
 	std::list<Tube> m_tubes;
 
 	/**
-	 * @brief Les derniers noeuds à avoir été swappé.
+	 * @brief L'historique des noeuds swappés.
 	 */
-	std::pair<Tree<const City*>*, Tree<const City*>*> m_swappedNodes;
+	std::stack<std::pair<Tree<const City*>*, Tree<const City*>*>> m_swapHistory;
 
 	/**
 	 * @brief L'historique des déplacement effectués dans le type.
