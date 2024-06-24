@@ -35,9 +35,7 @@ Instance::Instance(Instance&& other) noexcept :
     m_cities(move(other.m_cities)),
     m_cohorts(move(other.m_cohorts)),
     m_maxFreeze(other.m_maxFreeze)
-{
-    other.m_maxFreeze = 0;
-}
+{}
 
 
 const list<unique_ptr<City>>& Instance::getCities() const {return m_cities;}

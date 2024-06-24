@@ -67,7 +67,7 @@ Instance Parser::parseInstance(const string& fileLocation)
 	for(int i=0 ; i<cityCount ; i++)
 	{
 		// On récupère la demande de la ville
-		list<int> demandes;
+		vector<int> demandes;
 		iss = newLine(file);
 		for(int demande; iss >> demande;)
 			demandes.emplace_back(demande);
@@ -133,7 +133,10 @@ void parseTubeTree(Tube& tube, ifstream& file, Instance& instance)
 		else
 			for(const auto& cityPtr: instance.getCities())
 				if(cityPtr->getId() == arc[1])
+				{
 					node->addNode(cityPtr.get());
+					tube.consume(cityPtr->getDemande(tube.getType()));
+				}
 
 		arcs.pop();
 	}
@@ -154,7 +157,10 @@ Solution Parser::parseSolution(const string& fileLocation, Instance instance)
 			for(Tube& tube: type.getTubes())
 				for((iss = newLine(file)).ignore(8); iss >> n;)
 					if(n == cohortPtr->getId())
+					{
 						tube.setUsedByCohort(true);
+						tube.consume(cohortPtr->getDemande(tube.getType()));
+					}
 
 	for(Cohort* cohortPtr: instance.getCohorts())
 		for(Type& type: cohortPtr->getTypes())

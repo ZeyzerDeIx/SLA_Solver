@@ -12,7 +12,9 @@ concept IsPointer = std::is_pointer_v<T>;
 /**
  * @brief Classe représentant un arbre générique.
  * 
- * Cette classe permet de représenter un arbre générique avec des noeuds de type T. Il n'y a pas de distinction entre un noeud et un arbre. Chaque noeud est un arbre en soit.
+ * Cette classe permet de représenter un arbre générique avec des noeuds de type T.
+ * \note
+ * Il n'y a pas de distinction entre un noeud et un arbre. Chaque noeud est un arbre en soit.
  */
 template<typename T>
 class Tree
@@ -44,6 +46,7 @@ public:
 	 * Construit un noeud avec une valeure spécifiée.
 	 * 
 	 * @param value La valeur du noeud.
+	 * @param root La racine de l'arbre.
 	 */
 	Tree(T value, Tree<T>* root = nullptr):
 		m_value(value),
@@ -53,14 +56,15 @@ public:
 	/**
 	 * @brief Constructeur de copie.
 	 *
-	 * @param[in] other l'arbre à copier.
+	 * @param[in] other L'arbre à copier.
+	 * @param root La racine de l'arbre, si null copie celle de l'arbre source.
 	 */
-	Tree(const Tree<T>& other):
+	Tree(const Tree<T>& other, Tree<T>* root = nullptr):
 		m_value(other.m_value),
-		m_root(other.m_root)
+		m_root(root == nullptr ? other.m_root : root)
 	{
 		for(const Tree<T>& node : other.m_nodes)
-			m_nodes.emplace_back(node.getValue(), this);
+			m_nodes.emplace_back(node, this);
 	}
 
 	/**
@@ -73,9 +77,12 @@ public:
 	 */
 	Tree(Tree<T>&& other):
 		m_value(std::move(other.m_value)),
-		m_root(std::move(m_root)),
+		m_root(std::move(other.m_root)),
 		m_nodes(std::move(other.m_nodes))
-	{}
+	{
+		for(Tree<T>& node : m_nodes)
+			node.setRoot(this);
+	}
 
 	/**
 	 * @brief Opérateur d'affectation par déplacement.
@@ -95,6 +102,8 @@ public:
             m_value = std::move(other.m_value);
             m_root = std::move(other.m_root);
             m_nodes = std::move(other.m_nodes);
+            for(Tree<T>& node : m_nodes)
+				node.setRoot(this);
         }
         return *this;
     }
@@ -315,7 +324,7 @@ public:
 	 */
 	int getDepth() const
 	{
-		return m_root != nullptr ? m_root->getDepth()+1 : 1;
+		return m_root != nullptr ? m_root->getDepth()+1 : 0;
 	}
 
 	/**
@@ -329,11 +338,23 @@ public:
 
 		if(nodeCount() == 0) return maxDepth;
 
-		for(const Tree<T>& node : m_nodes)
-			if(int nodeMaxDepth = node.getMaxDepth() > maxDepth)
-				maxDepth = nodeMaxDepth;
+		for(int nodeMaxDepth = 0; const Tree<T>& node : m_nodes)
+			maxDepth = std::max(node.getMaxDepth(), maxDepth);
 
 		return maxDepth;
+	}
+
+	/**
+	 * @brief Récupérer la racine la plus lointaine.
+	 *
+	 * @return Un pointeur vers la vraie racine.
+	 */
+	Tree<T>* getTrueRoot()
+	{
+		Tree<T>* trueRoot(this);
+		while (trueRoot->getRoot() != nullptr)
+			trueRoot = trueRoot->getRoot();
+		return trueRoot;
 	}
 
 

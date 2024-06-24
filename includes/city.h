@@ -1,8 +1,10 @@
 #pragma once
 
 #include <string>
-#include <list>
+#include <vector>
 #include <iostream>
+
+class Type;
 
 /**
  * @brief Cette classe modélise une ville.
@@ -22,21 +24,30 @@ public:
 	 * @param[in] id L'identifiant de la ville.
 	 * @param[in] demandes Les demandes de la ville.
 	 */
-	City(int id, std::list<int> demandes);
+	City(int id, std::vector<int> demandes);
 
 	/**
 	 * @brief Permet de récupérer la liste des demandes de la ville.
 	 *
 	 * @return Les demandes.
 	 */
-	const std::list<int>& getDemandes();
+	const std::vector<int>& getDemandes();
+
+	/**
+	 * @brief Récuperer la demande de la ville pour un type donné.
+	 *
+	 * @param[in] type Le type dont on souhaite connaitre la demande.
+	 *
+	 * @return La demande correspondante.
+	 */
+	int getDemande(const Type& type) const;
 
 	/**
 	 * @brief Définit les demandes de la ville.
 	 *
 	 * @param[in] demandes Les demandes.
 	 */
-	void setDemandes(std::list<int> demandes);
+	void setDemandes(std::vector<int> demandes);
 
 	/**
 	 * @brief Retourne l'identifiant de la ville.
@@ -88,5 +99,5 @@ protected:
 	/**
 	 * @brief Demandes de la ville par type de tube.
 	 */
-	std::list<int> m_demandes;
+	std::vector<int> m_demandes;
 };

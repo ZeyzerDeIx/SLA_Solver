@@ -87,5 +87,5 @@ void Tube::verbosePrint()
 
 ostream& operator<<(ostream& os, const Tube& tube)
 {
-	return os << tube.m_volume-tube.m_usedVolume << "/" << tube.m_volume;
+	return os << tube.getRemainingVolume() << "/" << tube.m_volume;
 }

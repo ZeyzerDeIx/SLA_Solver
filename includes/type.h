@@ -51,6 +51,13 @@ public:
 	Tree<const City*>& getRandomNode();
 
 	/**
+	 * @brief Récupérer un tube aléatoire du type.
+	 *
+	 * @return Le tube aléatoire.
+	 */
+	Tube& getRandomTube();
+
+	/**
 	 * @brief Échange les valeures de deux noeuds dans les tubes.
 	 *
 	 * @param a Premier noeud.
@@ -107,6 +114,8 @@ public:
 	 * @brief Affiche le dernier swap.
 	 */
 	void displayLastSwap();
+
+	void displayMoveHistory();
 
 	/**
 	 * @brief Permet d'afficher du type sur un flux (cout, fichier en écriture, etc.)

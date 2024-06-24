@@ -36,6 +36,13 @@ public:
 	unsigned int getMaxAliquo() const;
 
 	/**
+	 * @brief Récupérer l'instance de la solution.
+	 *
+	 * @return Une référence constantes à l'instance.
+	 */
+	const Instance& getInstance() const;
+
+	/**
 	 * @brief Détermine si la solution est meilleurs que celle donnée en paramètre.
 	 *
 	 * @param[in] other L'autre solution.
@@ -66,6 +73,11 @@ public:
 	 * @brief Affiche le dernier swap éffectué.
 	 */
 	void displayLastSwap();
+
+	/**
+	 * @brief Affiche tous les moves effectés.
+	 */
+	void displayMoveHistory();
 
 	/**
 	 * @brief Déplace aléatoirement un noeud dans un type également aléatoire.

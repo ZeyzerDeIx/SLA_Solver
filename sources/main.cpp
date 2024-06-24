@@ -19,38 +19,21 @@ int main()
 	int limit = 0 ;
 	for(; aliquoBase <= solution.getMaxAliquo() && limit < LIMIT; limit++)
 	{
-		cout << "revert 1" << endl;
 		solution.revertMove();
-		cout << "revert 2" << endl;
 		solution.revertMove();
-		cout << "move 1" << endl;
+		solution.revertMove();
 		solution.randomMoveInType();
-		cout << "move 2" << endl;
+		solution.randomMoveInType();
 		solution.randomMoveInType();
 	}
 	if(limit != LIMIT)
 	{
 		cout << "Max aliquo fin: " << solution.getMaxAliquo() << endl;
 		cout << "Nombre d'essais " << limit << endl;
-		solution.displayLastSwap();
+		cout << "Solution valide: " << endl;
+		solution.displayMoveHistory();
 	}
 	else cout << "Echec de la mission" << endl;
-
-	/*cout << "Tube:" << endl;
-	aliquoBase = solution.getMaxAliquo();
-	limit = 0 ;
-	for(; aliquoBase <= solution.getMaxAliquo() && limit < LIMIT; limit++)
-	{
-		solution.revertSwap();
-		solution.randomSwapInTube();
-	}
-	if(limit != LIMIT)
-	{
-		cout << "Max aliquo fin: " << solution.getMaxAliquo() << endl;
-		cout << "Nombre d'essais " << limit << endl;
-		solution.displayLastSwap();
-	}
-	else cout << "Echec de la mission" << endl;*/
 
 
 	auto end = chrono::steady_clock::now();   // Point B

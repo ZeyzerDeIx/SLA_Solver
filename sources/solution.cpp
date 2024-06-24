@@ -58,6 +58,11 @@ unsigned int Solution::getMaxAliquo() const
 	return maxAliquo;
 }
 
+const Instance& Solution::getInstance() const
+{
+	return m_instance;
+}
+
 bool Solution::isBetterThan(const Solution& other)
 {
 	return getMaxAliquo() < other.getMaxAliquo();
@@ -88,6 +93,25 @@ void Solution::displayLastSwap()
 {
 	DISPLAY_SWAP(m_swappedTube);
 	DISPLAY_SWAP(m_swappedType);
+}
+
+void Solution::displayMoveHistory()
+{
+	stack<Type*> typesBuffer;
+	while(!m_movedTypeHistory.empty())
+	{
+		typesBuffer.push(move(m_movedTypeHistory.top()));
+		m_movedTypeHistory.pop();
+	}
+
+	while(!typesBuffer.empty())
+	{
+		typesBuffer.top()->verbosePrint();
+		typesBuffer.top()->displayMoveHistory();
+
+		m_movedTypeHistory.push(move(typesBuffer.top()));
+		typesBuffer.pop();
+	}
 }
 
 void Solution::randomMoveInType()

@@ -29,9 +29,14 @@ Tube& Type::addTube(Tube tube)
 
 CityTree& Type::getRandomNode()
 {
+	return getRandomTube().getTree().getRandomNode();
+}
+
+Tube& Type::getRandomTube()
+{
 	int rdm = Random::randomNb(0, m_tubes.size()-1);
 	auto it = next(m_tubes.begin(), rdm);
-	return it->getTree().getRandomNode();
+	return *it;
 }
 
 void Type::swapNodes(CityTree& a, CityTree& b, bool saveSwap)
@@ -66,19 +71,23 @@ void Type::moveNode(CityTree* toMove, CityTree* a, CityTree* b)
 	list<CityTree>& aList = a->getNodes();
 
 	// tmTRoot pour toMoveTrueRoot, la racine là plus lointaine de toMove
-	CityTree* tmTRoot = root;
-	while (tmTRoot->getRoot() != nullptr)
-		tmTRoot = tmTRoot->getRoot();
+	CityTree* tmTRoot = root->getTrueRoot();
 
 	// aTRoot pour aTrueRoot
-	CityTree* aTRoot = a;
-	while (aTRoot->getRoot() != nullptr)
-		aTRoot = aTRoot->getRoot();
+	CityTree* aTRoot = a->getTrueRoot();
 
-	cout << "tmTRoot:\n" << *tmTRoot << endl;
-	cout << "aTRoot:\n" << *aTRoot << endl;
+	//cout << "toMove\n" << *toMove << endl;
+	//cout << "tmTRoot\n" << *tmTRoot << endl;
 
-	ArchivedMove archive = {tmTRoot,CityTree(*tmTRoot), aTRoot, CityTree(*aTRoot)};
+	//cout << "dest\n" << *a << endl;
+	//cout << "destTRoot\n" << *aTRoot << endl;
+
+	ArchivedMove archive = {aTRoot,CityTree(*aTRoot), tmTRoot, CityTree(*tmTRoot)};
+
+	/*cout << "archived version" << endl;
+	cout << "tmTRoot\n" << archive.formerTRootSave << endl;
+
+	cout << "destTRoot\n" << archive.destTRootSave << endl;*/
 
 	// Si le noeud à déplacer possèdes des successeurs.
 	if(toMove->nodeCount() != 0)
@@ -98,6 +107,16 @@ void Type::moveNode(CityTree* toMove, CityTree* a, CityTree* b)
 
 	// On enregistre le déplacement.
 	m_moveHistory.push(archive);
+
+	//cout << "moved version" << endl;
+
+	//cout << "toMove\n" << *toMove << endl;
+	//cout << "tmTRoot\n" << *tmTRoot << endl;
+
+	//cout << "dest\n" << *a << endl;
+	//cout << "destTRoot\n" << *aTRoot << endl;
+
+	//cout << "node moved" << endl;
 }
 
 void Type::moveRandomNode()
@@ -105,43 +124,49 @@ void Type::moveRandomNode()
 	CityTree* dest(nullptr);
 	CityTree* toMove(nullptr);
 	CityTree* b(nullptr);
-	for(bool loop = true; loop;)
+
+	int maxFreeze = m_cohort.getInstance().getMaxFreeze();
+
+
+	auto canBeMoved = [](CityTree* toMove)
 	{
-		// On tire un noeud aléatoire.
-		dest = &getRandomNode();
-		// Si l'unes des conditions suivante est vrai, alors on recommance la boucle.
-		loop =
-			// Si le noeud est null.
-			dest == nullptr or
-			// Si la destination est déjà à la profondeure max.
-			dest->getDepth() == m_cohort.getInstance().getMaxFreeze();
-	}
+		return toMove != nullptr;
+	};
 	
-	for(bool loop = true; loop;)
+	Tube* toMoveTube = nullptr;
+	do
 	{
-		// On tire un noeud aléatoire.
-		toMove = &getRandomNode();
+		toMoveTube = &getRandomTube();
+		toMove = &toMoveTube->getTree().getRandomNode();
+	} while (!canBeMoved(toMove));
 
-		// Si le pointeur est null, on reboucle de suite.
-		if(toMove == nullptr) continue;
+	auto canBeDest = [&](Tube* tube, CityTree* dest)
+	{
+		if(dest == nullptr or dest->getDepth() == maxFreeze)
+			return false;
 
-		list<CityTree>& nodes = toMove->getNodes();
+		if(toMoveTube != tube and tube->getRemainingVolume() < dest->getValue()->getDemande(tube->getType()))
+			return false;
+		return true;
+	};
 
-		// On cherche parmis les successeurs directs de toMove si dest est présent.
-		auto found = find_if(nodes.begin(), nodes.end(),
-			[&dest](const CityTree& tree){return dest == &tree;}
-		);
-		// Si dest est successeur, alors on reboucle car cela reviendrait à faire un simple swap (en plus de provoquer des problèmes)
-		loop = found != nodes.end();
-	}
+	Tube* destTube = nullptr;
+	int limit = 0;
+	do
+	{
+		destTube = &getRandomTube();
+		dest = &destTube->getTree().getRandomNode();
+	} while (!canBeDest(destTube, dest) && ++limit != 100);
+
+	if(limit == 100)
+		return;
 	
 	for(CityTree& node: dest->getNodes())
 	{
-		// On tire un noeud aléatoire.
 		b = &node;
 
-		if(b->getMaxDepth() != m_cohort.getInstance().getMaxFreeze())
-			break;
+		if(b->getMaxDepth() != maxFreeze) break;
+		b = nullptr;
 	}
 
 	moveNode(toMove, dest, b);
@@ -153,14 +178,22 @@ void Type::revertMove()
 
 	ArchivedMove& archive = m_moveHistory.top();
 
-	cout << "archive.destTRoot\n" << *archive.destTRoot << endl;
-	cout << "archive.formerTRoot\n" << *archive.formerTRoot << endl;
+	//cout << "revert begin" << endl;
+
+	//cout << "destTRoot:\n" << *archive.destTRoot << endl;
+	//cout << "formerTRoot:\n" << *archive.formerTRoot << endl;
+	//cout << "rdm former node:\n" << *archive.formerTRoot->getRandomNode().getTrueRoot() << endl;
+
+	//cout << "destTRootSave rdm node:\n" << *archive.destTRootSave.getRandomNode().getTrueRoot() << endl;
+
 	*archive.destTRoot = move(archive.destTRootSave);
 	*archive.formerTRoot = move(archive.formerTRootSave);
-	cout << "archive.destTRoot\n" << *archive.destTRoot << endl;
-	cout << "archive.formerTRoot\n" << *archive.formerTRoot << endl;
+	//cout << "destTRoot:\n" << *archive.destTRoot << endl;
+	//cout << "formerTRoot:\n" << *archive.formerTRoot << endl;
+	//cout << "rdm former node:\n" << *archive.formerTRoot->getRandomNode().getTrueRoot() << endl;
 
 	m_moveHistory.pop();
+	//cout << "revert end" << endl;
 }
 
 void Type::verbosePrint()
@@ -171,6 +204,29 @@ void Type::verbosePrint()
 void Type::displayLastSwap()
 {
 	cout << "Swapped " << m_swapHistory.top().first->getValue() << " with " << m_swapHistory.top().second->getValue() << endl;
+}
+
+void Type::displayMoveHistory()
+{
+	stack<ArchivedMove> movesBuffer;
+	while(!m_moveHistory.empty())
+	{
+		movesBuffer.push(move(m_moveHistory.top()));
+		m_moveHistory.pop();
+	}
+
+	while(!movesBuffer.empty())
+	{
+		ArchivedMove& archive = movesBuffer.top();
+
+		cout << "Destination before move:\n" << archive.destTRootSave << endl;
+		cout << "Destination after move:\n" << *archive.destTRoot << endl;
+		cout << "Former root before move:\n" << archive.formerTRootSave << endl;
+		cout << "Former root after move:\n" << *archive.formerTRoot << endl;
+
+		m_moveHistory.push(move(archive));
+		movesBuffer.pop();
+	}
 }
 
 ostream& operator<<(ostream& os, const Type& type)
