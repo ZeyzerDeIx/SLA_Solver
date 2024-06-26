@@ -2,17 +2,16 @@
 #include "cohort.h"
 #include "instance.h"
 #include "random.h"
+#include <ranges>
+#include <algorithm>
 
 using namespace std;
-// Un alias commode pour rendre le code plus concis.
-using CityTree = Tree<const City*>;
 
 Type::Type(const Cohort& cohort, int id):
 	m_cohort(cohort),
 	m_id(id)
 {}
-Type::~Type()
-{}
+Type::~Type() {}
 
 int Type::getId() const {return m_id;}
 
@@ -49,16 +48,105 @@ void Type::swapNodes(CityTree& a, CityTree& b, bool saveSwap)
 	if(saveSwap) m_swapHistory.push({&a,&b});
 }
 
+void Type::swapNodes(CityTree& a, CityTree& b, CityTree& c, bool saveSwap)
+{
+	if(&a == nullptr or &b == nullptr or &c == nullptr) return;
+
+	int maxFreeze = m_cohort.getInstance().getMaxFreeze();
+
+	const City* temp = a.getValue();
+	a.setValue(b.getValue());
+	b.setValue(temp);
+
+	if(a.getDepth() != maxFreeze) moveNode(&c, &a);
+	else moveNode(&c, a.getRoot());
+
+	if(saveSwap) m_swapHistory.push({&a,&b,true,&c});
+}
+
+void Type::swapNodes(CityTree& a, CityTree& b, CityTree& c, CityTree& d, bool saveSwap)
+{
+	swapNodes(a,c, false);
+	swapNodes(b,d, false);
+
+	if(saveSwap) m_swapHistory.push({&a,&b,false,&c,&d});
+}
+
 void Type::swapRandomNodes()
 {
-	swapNodes(getRandomNode(),getRandomNode());
+	// Première chose, on récupère deux tube aléatoire ayant des noeuds dans leur arbre.
+	Tube *tube1(nullptr), *tube2(nullptr);
+
+	vector<Tube*> shufTubes;
+	for(Tube& tube : m_tubes)
+		shufTubes.push_back(&tube);
+	random_device rd;
+	mt19937 g(rd());
+	shuffle(shufTubes.begin(), shufTubes.end(), g);
+
+	for(auto it = shufTubes.begin(); it != shufTubes.end();)
+	{
+		if((*it)->getTree().nodeCount() == 0)
+			it = shufTubes.erase(it);
+		else if(tube1 == nullptr)
+			(tube1 = *it), ++it;
+		else {(tube2 = *it); break;}
+	}
+
+	// Si aucun tube n'a été trouvé pour tube2, alors aucun swap n'est possible
+	if(tube2 == nullptr) return;
+
+	CityTree *node1(nullptr), *node2(nullptr), *node3(nullptr), *node4(nullptr);
+
+	switch(Random::randomNb(1,3))
+	{
+	case 1:
+		do
+		{
+			node1 = &tube1->getTree().getRandomNode();
+			node2 = &tube2->getTree().getRandomNode();
+		} while(!checkVolumes(*tube1, *node1, *tube2, *node2));
+
+		swapNodes(*node1, *node2);
+		break;
+	case 2:
+		do
+		{
+			node1 = &tube1->getTree().getRandomNode();
+			node2 = &tube2->getTree().getRandomNode();
+			node3 = &tube2->getTree().getRandomNode();
+		} while(node2 == node3 or !checkVolumes(*tube1, *node1, *tube2, *node2, *node3));
+
+		swapNodes(*node1, *node2, *node3);
+		break;
+	case 3:
+		do
+		{
+			node1 = &tube1->getTree().getRandomNode();
+			node2 = &tube1->getTree().getRandomNode();
+			node3 = &tube2->getTree().getRandomNode();
+			node4 = &tube2->getTree().getRandomNode();
+		} while(node1 == node2 or node3 == node4 or
+				!checkVolumes(*tube1, *node1, *node2, *tube2, *node3, *node4));
+
+		swapNodes(*node1, *node2);
+		break;
+	}
 }
 
 void Type::revertSwap()
 {
-	if(m_swapHistory.size() == 0) return;
+	if(m_swapHistory.empty()) return;
 
-	swapNodes(*m_swapHistory.top().first, *m_swapHistory.top().second, false);
+	ArchivedSwap& archive = m_swapHistory.top();
+
+	if(archive.d == nullptr)
+		swapNodes(*archive.a, *archive.b, false);
+	else
+		swapNodes(*archive.a, *archive.b, *archive.c, *archive.d, false);
+
+	if(archive.movedSomething) revertMove();
+
 	m_swapHistory.pop();
 }
 
@@ -76,18 +164,7 @@ void Type::moveNode(CityTree* toMove, CityTree* a, CityTree* b)
 	// aTRoot pour aTrueRoot
 	CityTree* aTRoot = a->getTrueRoot();
 
-	//cout << "toMove\n" << *toMove << endl;
-	//cout << "tmTRoot\n" << *tmTRoot << endl;
-
-	//cout << "dest\n" << *a << endl;
-	//cout << "destTRoot\n" << *aTRoot << endl;
-
-	ArchivedMove archive = {aTRoot,CityTree(*aTRoot), tmTRoot, CityTree(*tmTRoot)};
-
-	/*cout << "archived version" << endl;
-	cout << "tmTRoot\n" << archive.formerTRootSave << endl;
-
-	cout << "destTRoot\n" << archive.destTRootSave << endl;*/
+	ArchivedMove archive = {aTRoot,CityTree(*aTRoot), tmTRoot,  CityTree(*tmTRoot)};
 
 	// Si le noeud à déplacer possèdes des successeurs.
 	if(toMove->nodeCount() != 0)
@@ -107,16 +184,6 @@ void Type::moveNode(CityTree* toMove, CityTree* a, CityTree* b)
 
 	// On enregistre le déplacement.
 	m_moveHistory.push(archive);
-
-	//cout << "moved version" << endl;
-
-	//cout << "toMove\n" << *toMove << endl;
-	//cout << "tmTRoot\n" << *tmTRoot << endl;
-
-	//cout << "dest\n" << *a << endl;
-	//cout << "destTRoot\n" << *aTRoot << endl;
-
-	//cout << "node moved" << endl;
 }
 
 void Type::moveRandomNode()
@@ -172,28 +239,40 @@ void Type::moveRandomNode()
 	moveNode(toMove, dest, b);
 }
 
+// Ces macros permettent juste de rendre le code plus lisible.
+#define demandeOf(node) node.getValue()->getDemande(*this)
+#define volumeOf(tube) tube.getRemainingVolume()
+bool Type::checkVolumes(const Tube& tube1, const CityTree& node1, const Tube& tube2, const CityTree& node2)
+{
+	return
+		demandeOf(node1) <= volumeOf(tube2) + demandeOf(node2) and 
+		demandeOf(node2) <= volumeOf(tube1) + demandeOf(node1);
+}
+
+bool Type::checkVolumes(const Tube& tube1, const CityTree& node1, const Tube& tube2, const CityTree& node2, const CityTree& node3)
+{
+	return
+		demandeOf(node1) <= volumeOf(tube2) + demandeOf(node2) + demandeOf(node3) and
+		demandeOf(node2) + demandeOf(node3) <= volumeOf(tube1) + demandeOf(node1);
+}
+
+bool Type::checkVolumes(const Tube& tube1, const CityTree& node1, const CityTree& node2, const Tube& tube2, const CityTree& node3, const CityTree& node4)
+{
+	return
+		demandeOf(node1) + demandeOf(node2) <= volumeOf(tube2) + demandeOf(node3) + demandeOf(node4) and
+		demandeOf(node3) + demandeOf(node4) <= volumeOf(tube1) + demandeOf(node1) + demandeOf(node2);
+}
+
 void Type::revertMove()
 {
-	if(m_moveHistory.size() == 0) return;
+	if(m_moveHistory.empty()) return;
 
 	ArchivedMove& archive = m_moveHistory.top();
 
-	//cout << "revert begin" << endl;
-
-	//cout << "destTRoot:\n" << *archive.destTRoot << endl;
-	//cout << "formerTRoot:\n" << *archive.formerTRoot << endl;
-	//cout << "rdm former node:\n" << *archive.formerTRoot->getRandomNode().getTrueRoot() << endl;
-
-	//cout << "destTRootSave rdm node:\n" << *archive.destTRootSave.getRandomNode().getTrueRoot() << endl;
-
 	*archive.destTRoot = move(archive.destTRootSave);
 	*archive.formerTRoot = move(archive.formerTRootSave);
-	//cout << "destTRoot:\n" << *archive.destTRoot << endl;
-	//cout << "formerTRoot:\n" << *archive.formerTRoot << endl;
-	//cout << "rdm former node:\n" << *archive.formerTRoot->getRandomNode().getTrueRoot() << endl;
 
 	m_moveHistory.pop();
-	//cout << "revert end" << endl;
 }
 
 void Type::verbosePrint()
@@ -203,7 +282,9 @@ void Type::verbosePrint()
 
 void Type::displayLastSwap()
 {
-	cout << "Swapped " << m_swapHistory.top().first->getValue() << " with " << m_swapHistory.top().second->getValue() << endl;
+	ArchivedSwap& archive = m_swapHistory.top();
+	cout << "Swapped " << archive.a->getValue() << " with " << archive.b->getValue() << endl;
+	if(archive.movedSomething) cout << m_moveHistory.top() << endl;
 }
 
 void Type::displayMoveHistory()
@@ -219,10 +300,7 @@ void Type::displayMoveHistory()
 	{
 		ArchivedMove& archive = movesBuffer.top();
 
-		cout << "Destination before move:\n" << archive.destTRootSave << endl;
-		cout << "Destination after move:\n" << *archive.destTRoot << endl;
-		cout << "Former root before move:\n" << archive.formerTRootSave << endl;
-		cout << "Former root after move:\n" << *archive.formerTRoot << endl;
+		cout << archive << endl;
 
 		m_moveHistory.push(move(archive));
 		movesBuffer.pop();
@@ -235,6 +313,15 @@ ostream& operator<<(ostream& os, const Type& type)
 	cout << "size: " << type.m_tubes.size() << endl;
 	for(const Tube& tube: type.m_tubes)
 		os << tube << endl;
+	return os;
+}
+
+ostream& operator<<(ostream& os, const ArchivedMove& move)
+{
+	os << "Destination before move:\n" << move.destTRootSave << endl;
+	os << "Destination after move:\n" << *move.destTRoot << endl;
+	os << "Former root before move:\n" << move.formerTRootSave << endl;
+	os << "Former root after move:\n" << *move.formerTRoot << endl;
 	return os;
 }
 

@@ -3,6 +3,41 @@
 #include <stack>
 #include "tube.h"
 
+// Un alias commode pour rendre le code plus concis.
+using CityTree = Tree<const City*>;
+
+
+/**
+ * @brief Cette structure permet d'archiver toutes les information nécessaires à l'annulation d'un swap.
+ */
+struct ArchivedSwap
+{
+	CityTree* a;
+	CityTree* b;
+	bool movedSomething = false;
+	CityTree* c = nullptr;
+	CityTree* d = nullptr;
+};
+
+/**
+ * @brief Cette structure permet d'archiver toutes les information nécessaires à l'annulation d'un déplacement.
+ */
+struct ArchivedMove
+{
+	/**
+	 * @brief destTRoot pour destinationTrueRoot, la racine la plus lointaine de la destination avant déplacement.
+	 */
+	CityTree* destTRoot;
+	CityTree destTRootSave;
+	/**
+	 * @brief formerTRoot pour formerTrueRoot, la racine la plus lointaine du noeud avant déplacement.
+	 */
+	CityTree* formerTRoot;
+	CityTree formerTRootSave;
+};
+std::ostream& operator<<(std::ostream& os, const ArchivedMove& move);
+
+
 /**
  * @brief Cette classe modélise une type de tube.
  * 
@@ -64,10 +99,37 @@ public:
 	 * @param b Second noeud.
 	 * @param[in] saveSwap Si le swap doit être sauvegardé dans l'historique des swap. Typiquement faux en cas de revert.
 	 */
-	void swapNodes(Tree<const City*>& a, Tree<const City*>& b, bool saveSwap = true);
+	void swapNodes(CityTree& a, CityTree& b, bool saveSwap = true);
+	/**
+	 * @brief Échange les valeures d'un noeud avec deux autres dans deux tubes.
+	 * 
+	 * Le noeud solitaire est échangé normalement avec l'un des deux autres et le dernier est inséré si possible en tant que successeurs de celui qui vient d'être échangé. Si cela est impossible, il sera alors successeur de la même racine.
+	 * 
+	 * \note
+	 * Les noeuds 2 et 3 doivent provenir du même tube.
+	 *
+	 * @param a Premier noeud.
+	 * @param b Deuxième noeud.
+	 * @param c Troisième noeud.
+	 * @param[in] saveSwap Si le swap doit être sauvegardé dans l'historique des swap. Typiquement faux en cas de revert.
+	 */
+	void swapNodes(CityTree& a, CityTree& b, CityTree& c, bool saveSwap = true);
+	/**
+	 * @brief Échange les valeures de deux noeud avec deux autres dans deux tubes différents.
+	 * 
+	 * \note
+	 * Les noeuds 1 et 2 doivent provenir du même tube et il en va de même pour 3 et 4.
+	 *
+	 * @param a Premier noeud.
+	 * @param b Deuxième noeud.
+	 * @param c Troisième noeud.
+	 * @param d Quatrième noeud.
+	 * @param[in] saveSwap Si le swap doit être sauvegardé dans l'historique des swap. Typiquement faux en cas de revert.
+	 */
+	void swapNodes(CityTree& a, CityTree& b, CityTree& c, CityTree& d, bool saveSwap = true);
 
 	/**
-	 * @brief Swap deux noeuds aléatoire entre deux tubes aléatoires.
+	 * @brief Swap deux noeuds aléatoire entre deux tubes aléatoires en vérifiant que leur volumes le permettent.
 	 */
 	void swapRandomNodes();
 
@@ -88,12 +150,51 @@ public:
 	 * \note
 	 * Cette méthode ne vérifie pas la légalité du mouvement demandé. À utiliser avec précautions.
 	 */
-	void moveNode(Tree<const City*>* toMove, Tree<const City*>* a, Tree<const City*>* b = nullptr);
+	void moveNode(CityTree* toMove, CityTree* a, Tree<const City*>* b = nullptr);
 
 	/**
 	 * @brief Déplace un noeud choisit aléatoirement vers un autre également aléatoire.
 	 */
 	void moveRandomNode();
+
+	/**
+	 * @brief Vérifie si les nœuds peuvent être déplacés dans le tube de l’autre.
+	 *
+	 * @param[in] tube1 Le tube 1.
+	 * @param[in] node1 Le noeud 1 du tube 1.
+	 * @param[in] tube2 Le tube 2.
+	 * @param[in] node2 Le noeud 2 du tube 2.
+	 *
+	 * @return True si cela est possible, false si les volumes ne coïncident pas.
+	 */
+	bool checkVolumes(const Tube& tube1, const CityTree& node1, const Tube& tube2, const CityTree& node2);
+
+	/**
+	 * @brief Vérifie si les nœuds peuvent être déplacés d'un tube à l’autre.
+	 *
+	 * @param[in] tube1 Le tube 1.
+	 * @param[in] node1 Le noeud 1 du tube 1.
+	 * @param[in] tube2 Le tube 2.
+	 * @param[in] node2 Le noeud 2 du tube 2.
+	 * @param[in] node3 Le noeud 3 du tube 2.
+	 *
+	 * @return True si cela est possible, false si les volumes ne coïncident pas.
+	 */
+	bool checkVolumes(const Tube& tube1, const CityTree& node1, const Tube& tube2, const CityTree& node2, const CityTree& node3);
+
+	/**
+	 * @brief Vérifie si les nœuds peuvent être déplacés d'un tube à l’autre deux à deux.
+	 *
+	 * @param[in] tube1 Le tube 1.
+	 * @param[in] node1 Le noeud 1 du tube 1.
+	 * @param[in] node2 Le noeud 2 du tube 1.
+	 * @param[in] tube2 Le tube 2.
+	 * @param[in] node3 Le noeud 3 du tube 2.
+	 * @param[in] node4 Le noeud 4 du tube 2.
+	 *
+	 * @return True si cela est possible, false si les volumes ne coïncident pas.
+	 */
+	bool checkVolumes(const Tube& tube1, const CityTree& node1, const CityTree& node2, const Tube& tube2, const CityTree& node3, const CityTree& node4);
 
 	/**
 	 * @brief Annule le dernier déplacement de noeud effectué dans le type.
@@ -115,6 +216,9 @@ public:
 	 */
 	void displayLastSwap();
 
+	/**
+	 * @brief Affiche l'historique des déplacements.
+	 */
 	void displayMoveHistory();
 
 	/**
@@ -137,24 +241,6 @@ public:
 	bool operator==(const Type& other);
 	
 private:
-
-	/**
-	 * @brief Cette structure permet d'archiver toutes les information nécessaires à l'annulation d'un déplacement.
-	 */
-	struct ArchivedMove
-	{
-		/**
-		 * @brief destTRoot pour destinationTrueRoot, la racine la plus lointaine de la destination avant déplacement.
-		 */
-		Tree<const City*>* destTRoot;
-		Tree<const City*> destTRootSave;
-		/**
-		 * @brief formerTRoot pour formerTrueRoot, la racine la plus lointaine du noeud avant déplacement.
-		 */
-		Tree<const City*>* formerTRoot;
-		Tree<const City*> formerTRootSave;
-	};
-
 	/**
 	 * @brief Référence à la cohorte du type.
 	 */
@@ -175,7 +261,7 @@ private:
 	/**
 	 * @brief L'historique des noeuds swappés.
 	 */
-	std::stack<std::pair<Tree<const City*>*, Tree<const City*>*>> m_swapHistory;
+	std::stack<ArchivedSwap> m_swapHistory;
 
 	/**
 	 * @brief L'historique des déplacement effectués dans le type.

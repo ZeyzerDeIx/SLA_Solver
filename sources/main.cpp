@@ -19,19 +19,14 @@ int main()
 	int limit = 0 ;
 	for(; aliquoBase <= solution.getMaxAliquo() && limit < LIMIT; limit++)
 	{
-		solution.revertMove();
-		solution.revertMove();
-		solution.revertMove();
-		solution.randomMoveInType();
-		solution.randomMoveInType();
-		solution.randomMoveInType();
+		solution.revertSwap();
+		solution.randomSwapInType();
 	}
 	if(limit != LIMIT)
 	{
 		cout << "Max aliquo fin: " << solution.getMaxAliquo() << endl;
 		cout << "Nombre d'essais " << limit << endl;
 		cout << "Solution valide: " << endl;
-		solution.displayMoveHistory();
 	}
 	else cout << "Echec de la mission" << endl;
 

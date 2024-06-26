@@ -247,6 +247,20 @@ public:
 	}
 
 	/**
+	 * @brief Récupère un vecteur de tous les noeuds de l'arbre.
+	 * 
+	 * Cette méthode parcourt l'arbre entier et collecte tous les noeuds dans un vecteur.
+	 * 
+	 * @return Un vecteur contenantdes pointeur sur tous les noeuds de l'arbre.
+	 */
+	std::list<Tree<T>*> getAllNodes() const
+	{
+		std::list<Tree<T>*> nodes;
+		getAllNodesHelper(nodes);
+		return std::move(nodes);
+	}
+
+	/**
 	 * @brief Permet de trouver un noeud/arbre contenant la valeure donnée en entrée.
 	 *
 	 * @param[in] value La valeure recherchée.
@@ -387,6 +401,18 @@ private:
 		if(m_value != nullptr) values.push_back(m_value);
 		for(const Tree<T>& node : m_nodes)
 			node.getAllValuesHelper(values);
+	}
+
+	/**
+	 * @brief Fonction auxiliaire récursive pour collecter les noeuds de l'arbre.
+	 * 
+	 * @param nodes Référence au vecteur où les neouds seront collectées.
+	 */
+	void getAllNodesHelper(std::list<Tree<T>*>& nodes) const
+	{
+		nodes.push_back(this);
+		for(const Tree<T>& node : m_nodes)
+			node.getAllNodesHelper(nodes);
 	}
 
 	/**
